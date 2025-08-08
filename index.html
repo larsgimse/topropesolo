@@ -28,6 +28,9 @@
       font-size: 18px;
       font-weight: 600;
       transition: background-color 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .location-btn:hover {
@@ -66,6 +69,15 @@
     h3 {
       margin-bottom: 8px;
     }
+
+    /* SVG icon sizes */
+    .icon {
+      width: 22px;
+      height: 22px;
+      fill: white;
+      flex-shrink: 0;
+    }
+
   </style>
 </head>
 <body>
@@ -76,11 +88,33 @@
   </p>
 
   <div class="button-container">
-    <button class="location-btn" data-lat="69.69472" data-lng="18.63642" data-name="Korteidet">Korteidet</button>
-    <button class="location-btn" data-lat="69.78386" data-lng="18.78913" data-name="Lyfjorddalen">Lyfjorddalen</button>
-    <button class="location-btn" data-lat="69.65974" data-lng="18.95441" data-name="Valhall">Valhall</button>
-    <button id="overviewBtn" class="location-btn">Show All</button>
-    <button id="instagramBtn" class="location-btn">Instagram Profile</button>
+    <button class="location-btn" data-lat="69.69472" data-lng="18.63642" data-name="Korteidet" aria-label="Korteidet">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 2L3 20h18L12 2zM12 6.5l3.5 7h-7l3.5-7z" />
+      </svg>
+      Korteidet
+    </button>
+    <button class="location-btn" data-lat="69.78386" data-lng="18.78913" data-name="Lyfjorddalen" aria-label="Lyfjorddalen">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 2L3 20h18L12 2zM12 6.5l3.5 7h-7l3.5-7z" />
+      </svg>
+      Lyfjorddalen
+    </button>
+    <button class="location-btn" data-lat="69.65974" data-lng="18.95441" data-name="Valhall" aria-label="Valhall">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 2L3 20h18L12 2zM12 6.5l3.5 7h-7l3.5-7z" />
+      </svg>
+      Valhall
+    </button>
+    <button id="overviewBtn" class="location-btn" aria-label="Show all locations">
+      Show All
+    </button>
+    <button id="instagramBtn" class="location-btn" aria-label="Instagram Rope Solo Man profile">
+      <svg class="icon" viewBox="0 0 24 24" fill="white" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 2A3.75 3.75 0 004 7.75v8.5A3.75 3.75 0 007.75 20h8.5a3.75 3.75 0 003.75-3.75v-8.5A3.75 3.75 0 0016.25 4h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6zm4.5-3.5a1.25 1.25 0 110 2.5 1.25 1.25 0 010-2.5z"/>
+      </svg>
+      Rope Solo Man
+    </button>
   </div>
 
   <div id="map"></div>
@@ -129,7 +163,7 @@
       { 
         name: "Valhall", 
         coords: [69.65974, 18.95441], 
-        popup: `<b>Valhall</b><br>Impressive climbing location.` 
+        popup: `<b>Valhall</b><br>More info coming.` 
       }
     ];
 
