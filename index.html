@@ -1,237 +1,189 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Top Rope Solo - Tromsø 🌍</title>
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f0f4f8;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-    }
-    h1 {
-      color: #0066cc;
-      margin-top: 20px;
-      margin-bottom: 5px;
-    }
-    #info-text {
-      max-width: 600px;
-      margin: 10px auto 20px;
-      font-size: 1.1em;
-    }
-    #buttons {
-      margin-bottom: 10px;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Top Rope Solo – Tromsø</title>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  crossorigin=""
+/>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+  }
+  h1 {
+    color: #0066cc;
+    margin-bottom: 10px;
+  }
+  #info-text {
+    max-width: 800px;
+    margin: 0 auto 20px auto;
+    font-size: 18px;
+    color: #444;
+  }
+  #buttons {
+    margin-bottom: 15px;
+  }
+  button {
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    margin: 0 8px 8px 0;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  button:hover {
+    background-color: #004a99;
+  }
+  #map {
+    height: 500px;
+    width: 80vw;
+    max-width: 800px;
+    margin: 0 auto 20px auto;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  #instagramBtn {
+    background-color: #e1306c; /* Instagram pink */
+    margin-top: 10px;
+  }
+  #instagramBtn:hover {
+    background-color: #b92e58;
+  }
+  #instagram-text {
+    max-width: 800px;
+    margin: 8px auto 0 auto;
+    font-size: 16px;
+    color: #555;
+  }
+  #instagram-video-container {
+    max-width: 540px;
+    margin: 20px auto 0 auto;
+    text-align: center;
+  }
+  #instagram-video-container h2 {
+    color: #0066cc;
+    margin-bottom: 12px;
+  }
+  @media (max-width: 600px) {
+    #map {
+      width: 95vw;
+      height: 350px;
     }
     button {
-      background-color: #0066cc;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      margin: 0 8px;
-      padding: 10px 16px;
-      cursor: pointer;
-      font-size: 1em;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #004a99;
-    }
-    #map {
-      height: 80vh;
-      max-width: 90vw;
-      width: 100%;
-      max-width: 900px;
-      border: 2px solid #0066cc;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-    #instagram-section {
-      max-width: 600px;
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    #instagram-section button {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin: 0 auto 10px;
-    }
-    #instagram-section button svg {
-      width: 20px;
-      height: 20px;
-      fill: white;
+      font-size: 14px;
+      padding: 8px 14px;
     }
     #instagram-text {
-      font-size: 0.95em;
-      color: #555;
-      margin-top: 4px;
+      font-size: 14px;
     }
-  </style>
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/ol/ol.css"
-  />
-  <script src="https://cdn.jsdelivr.net/npm/ol/ol.js"></script>
+    #instagram-video-container {
+      max-width: 95vw;
+    }
+  }
+</style>
 </head>
 <body>
   <h1>Top Rope Solo - Tromsø 🌍</h1>
+
   <div id="info-text">
-    On this page, you will find information about places around Tromsø where Top Rope Solo is possible. The page will be updated regularly.
+    On this page, you will find information about places around Tromsø where Top Rope Solo is possible. The page will be updated continuously.
   </div>
 
   <div id="buttons">
-    <button id="overview-btn">Map overview</button>
-    <button id="korteidet-btn">Korteidet</button>
-    <button id="lyfjorddalen-btn">Lyfjorddalen</button>
+    <button id="overviewBtn">Map overview</button>
+    <button data-lat="69.69472" data-lng="18.63642" data-name="Korteidet">Korteidet</button>
+    <button data-lat="69.78386" data-lng="18.78913" data-name="Lyfjorddalen">Lyfjorddalen</button>
   </div>
 
   <div id="map"></div>
 
-  <div id="instagram-section">
-    <button id="instagram-btn" onclick="window.open('https://www.instagram.com/rope.solo.man/', '_blank')">
-      <!-- Instagram Icon SVG -->
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 2A3.75 3.75 0 004 7.75v8.5A3.75 3.75 0 007.75 20h8.5a3.75 3.75 0 003.75-3.75v-8.5A3.75 3.75 0 0016.25 4h-8.5zm8.5 1.75a1 1 0 110 2 1 1 0 010-2zM12 7a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"/></svg>
-      Rope Solo Man
-    </button>
-    <div id="instagram-text">
-      You can see pictures and video from Top Rope Solo on this profile
-    </div>
+  <button id="instagramBtn" aria-label="Instagram profile Rope Solo Man">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 2A3.75 3.75 0 004 7.75v8.5A3.75 3.75 0 007.75 20h8.5a3.75 3.75 0 003.75-3.75v-8.5A3.75 3.75 0 0016.25 4h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6zm4.5-3.5a1.25 1.25 0 110 2.5 1.25 1.25 0 010-2.5z"/>
+    </svg>
+    Rope Solo Man
+  </button>
+
+  <div id="instagram-text">
+    You can see pictures and video from Top Rope Solo on this profile
   </div>
 
+  <div id="instagram-video-container">
+    <h2>Video from Lyfjorddalen</h2>
+    <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DL8NKszNihY/" data-instgrm-version="14" style=" background:#FFF; border:0; margin: 0 auto; max-width:540px; width:100%; padding:0; box-shadow:none;">
+    </blockquote>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script async src="//www.instagram.com/embed.js"></script>
   <script>
-    // Initialize map and markers using OpenLayers
-    const korteidet = [18.63642, 69.69472];
-    const lyfjorddalen = [18.78913, 69.78386];
-
-    // Convert lon/lat to map projection (EPSG:3857)
-    function fromLonLat(coord) {
-      return ol.proj.fromLonLat(coord);
-    }
-
-    // Create markers features
-    const korteidetFeature = new ol.Feature({
-      geometry: new ol.geom.Point(fromLonLat(korteidet)),
-      name: 'Korteidet',
-      popupContent: 'Korteidet: Here comes more information',
-    });
-    const lyfjorddalenFeature = new ol.Feature({
-      geometry: new ol.geom.Point(fromLonLat(lyfjorddalen)),
-      name: 'Lyfjorddalen',
-      popupContent: 'Lyfjorddalen: Here comes more information',
-    });
-
-    // Vector source and layer for markers
-    const vectorSource = new ol.source.Vector({
-      features: [korteidetFeature, lyfjorddalenFeature],
-    });
-    const vectorLayer = new ol.layer.Vector({
-      source: vectorSource,
-      style: new ol.style.Style({
-        image: new ol.style.Icon({
-          anchor: [0.5, 1],
-          src: 'https://cdn-icons-png.flaticon.com/512/684/684908.png', // Pin icon
-          scale: 0.05,
-        }),
-      }),
-    });
-
-    // Map initialization
-    const map = new ol.Map({
-      target: 'map',
-      layers: [
-        new ol.layer.Tile({
-          source: new ol.source.OSM(), // OpenStreetMap base layer
-        }),
-        vectorLayer,
-      ],
-      view: new ol.View({
-        center: fromLonLat([18.7, 69.74]),
-        zoom: 10,
-      }),
-      controls: ol.control.defaults().extend([
-        new ol.control.FullScreen(),
-        new ol.control.ZoomSlider(),
-      ]),
-    });
-
-    // Popup overlay
-    const container = document.createElement('div');
-    container.id = 'popup';
-    container.style.position = 'absolute';
-    container.style.backgroundColor = 'white';
-    container.style.padding = '10px';
-    container.style.borderRadius = '8px';
-    container.style.border = '1px solid #0066cc';
-    container.style.minWidth = '200px';
-    container.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
-    container.style.display = 'none';
-    container.style.zIndex = '1000';
-
-    document.body.appendChild(container);
-
-    const overlay = new ol.Overlay({
-      element: container,
-      autoPan: {
-        animation: {
-          duration: 250,
-        },
+    const locations = [
+      {
+        name: 'Korteidet',
+        lat: 69.69472,
+        lng: 18.63642,
+        popup: '<strong>Korteidet</strong><br>Her kommer det mer informasjon om Korteidet.'
       },
-    });
-    map.addOverlay(overlay);
-
-    // Show popup function
-    function showPopup(feature) {
-      const coordinates = feature.getGeometry().getCoordinates();
-      container.innerHTML = `<strong>${feature.get('name')}</strong><br>${feature.get('popupContent')}`;
-      overlay.setPosition(coordinates);
-      container.style.display = 'block';
-    }
-
-    // Hide popup on map click elsewhere
-    map.on('click', function (evt) {
-      const feature = map.forEachFeatureAtPixel(evt.pixel, function (feat) {
-        return feat;
-      });
-      if (feature) {
-        showPopup(feature);
-      } else {
-        container.style.display = 'none';
+      {
+        name: 'Lyfjorddalen',
+        lat: 69.78386,
+        lng: 18.78913,
+        popup: '<strong>Lyfjorddalen</strong><br>Her kommer det mer informasjon om Lyfjorddalen.'
       }
+    ];
+
+    const map = L.map('map');
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    const markers = {};
+
+    locations.forEach(({name, lat, lng, popup}) => {
+      const marker = L.marker([lat, lng]).addTo(map).bindPopup(popup);
+      markers[name] = marker;
     });
 
-    // Button actions
-    document.getElementById('overview-btn').addEventListener('click', () => {
-      // Zoom to show both points
-      const extent = vectorSource.getExtent();
-      map.getView().fit(extent, { padding: [50, 50, 50, 50], maxZoom: 12 });
-      container.style.display = 'none';
+    // Zoom ut til alle markører ved oppstart
+    const group = new L.featureGroup(Object.values(markers));
+    map.fitBounds(group.getBounds().pad(0.2));
+
+    const buttons = document.querySelectorAll('#buttons button[data-name]');
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const lat = button.getAttribute('data-lat');
+        const lng = button.getAttribute('data-lng');
+        const name = button.getAttribute('data-name');
+
+        map.setView([lat, lng], 15);
+        markers[name].openPopup();
+      });
     });
 
-    document.getElementById('korteidet-btn').addEventListener('click', () => {
-      const coord = korteidetFeature.getGeometry().getCoordinates();
-      map.getView().animate({ center: coord, zoom: 14 });
-      showPopup(korteidetFeature);
+    document.getElementById('overviewBtn').addEventListener('click', () => {
+      map.fitBounds(group.getBounds().pad(0.2));
     });
 
-    document.getElementById('lyfjorddalen-btn').addEventListener('click', () => {
-      const coord = lyfjorddalenFeature.getGeometry().getCoordinates();
-      map.getView().animate({ center: coord, zoom: 14 });
-      showPopup(lyfjorddalenFeature);
+    document.getElementById('instagramBtn').addEventListener('click', () => {
+      window.open('https://www.instagram.com/rope.solo.man/', '_blank');
     });
-
-    // On page load show overview
-    window.onload = () => {
-      document.getElementById('overview-btn').click();
-    };
   </script>
 </body>
 </html>
