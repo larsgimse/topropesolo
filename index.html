@@ -34,6 +34,7 @@
     justify-content: center;
     flex-wrap: wrap;
     gap: 12px;
+    align-items: center; /* for vertikal sentrering */
   }
   button {
     background-color: #0066cc;
@@ -53,23 +54,29 @@
   }
   #map {
     height: 500px;
-    width: 80vw;
-    max-width: 800px;
+    width: 100vw;
+    max-width: 100%;
     margin: 0 auto 20px auto;
-    border-radius: 12px;
+    border-radius: 12px 12px 0 0;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
   #instagramBtn {
     background-color: #e1306c; /* Instagram pink */
-    margin-top: 10px;
+    margin-top: 0;
   }
   #instagramBtn:hover {
     background-color: #b92e58;
   }
+
+  /* Felles ramme rundt alle videoer */
   #instagram-video-container {
-    max-width: 95vw;
+    max-width: 98vw;
     margin: 20px auto 0 auto;
     text-align: center;
+    border: 3px solid #0066cc;
+    border-radius: 12px;
+    padding: 15px 10px;
+    box-sizing: border-box;
 
     display: flex;
     justify-content: center;
@@ -100,7 +107,7 @@
   }
   @media (max-width: 600px) {
     #map {
-      width: 95vw;
+      width: 100vw;
       height: 350px;
     }
     button {
@@ -111,6 +118,7 @@
       max-width: 95vw;
       flex-direction: column;
       gap: 15px;
+      padding: 15px;
     }
     .instagram-video-block {
       width: 100%;
@@ -137,23 +145,23 @@
 
   <div id="buttons">
     <button data-lat="69.69472" data-lng="18.63642" data-name="Korteidet" class="location-btn" aria-label="Korteidet">
-      <!-- Fjell ikon -->
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="white" stroke="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M2 21h20L12 2 2 21z"/>
+      <!-- Detaljert fjell ikon -->
+      <svg class="icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="white" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 4L12 44h12v16h16V44h12L32 4zM20 44l12-28 12 28H20z"/>
       </svg>
       Korteidet
     </button>
 
     <button data-lat="69.78386" data-lng="18.78913" data-name="Lyfjorddalen" class="location-btn" aria-label="Lyfjorddalen">
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="white" stroke="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M2 21h20L12 2 2 21z"/>
+      <svg class="icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="white" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 4L12 44h12v16h16V44h12L32 4zM20 44l12-28 12 28H20z"/>
       </svg>
       Lyfjorddalen
     </button>
 
     <button data-lat="69.65974" data-lng="18.95441" data-name="Valhall" class="location-btn" aria-label="Valhall">
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="white" stroke="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M2 21h20L12 2 2 21z"/>
+      <svg class="icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="white" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 4L12 44h12v16h16V44h12L32 4zM20 44l12-28 12 28H20z"/>
       </svg>
       Valhall
     </button>
@@ -164,14 +172,14 @@
       </svg>
       Show All
     </button>
-  </div>
 
-  <button id="instagramBtn" aria-label="Instagram profile Rope Solo Man">
-    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="white" xmlns="http://www.w3.org/2000/svg">
-      <path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 2A3.75 3.75 0 004 7.75v8.5A3.75 3.75 0 007.75 20h8.5a3.75 3.75 0 003.75-3.75v-8.5A3.75 3.75 0 0016.25 4h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6zm4.5-3.5a1.25 1.25 0 110 2.5 1.25 1.25 0 010-2.5z"/>
-    </svg>
-    Rope Solo Man
-  </button>
+    <button id="instagramBtn" aria-label="Instagram profile Rope Solo Man">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="white" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 2A3.75 3.75 0 004 7.75v8.5A3.75 3.75 0 007.75 20h8.5a3.75 3.75 0 003.75-3.75v-8.5A3.75 3.75 0 0016.25 4h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6zm4.5-3.5a1.25 1.25 0 110 2.5 1.25 1.25 0 010-2.5z"/>
+      </svg>
+      Rope Solo Man
+    </button>
+  </div>
 
   <div id="map"></div>
 
