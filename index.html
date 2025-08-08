@@ -3,42 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Climbing Map and Videos</title>
+  <title>Top Rope Solo</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #f4f4f4;
+      text-align: center;
+    }
+
+    .button-container {
+      margin: 20px 0;
+    }
+
+    .location-btn {
+      padding: 10px 15px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+    }
+
+    .location-btn:hover {
+      background-color: #0056b3;
     }
 
     #map {
       height: 500px;
       width: 100%;
+      margin-top: 10px;
     }
 
-    #controls {
-      text-align: center;
-      margin: 20px 0;
-    }
-
-    #controls button {
-      padding: 10px 15px;
-      margin: 5px;
-      border: none;
-      border-radius: 6px;
-      background-color: #007BFF;
-      color: white;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    #controls button:hover {
-      background-color: #0056b3;
-    }
-
-    /* Felles ramme rundt alle videoer */
+    /* Container for all videos */
     #instagram-video-container {
       max-width: 1200px;
       margin: 20px auto 0 auto;
@@ -53,28 +52,32 @@
       flex-wrap: wrap;
     }
 
-    /* Hver video er nå bare et element uten egen ramme */
+    /* Each video block */
     .instagram-video-block {
       width: 340px;
-      box-sizing: border-box;
-      background-color: white;
-      text-align: center;
+      flex-shrink: 0;
+      overflow: hidden;
+      margin: 0;
     }
 
-    .instagram-video-block h3 {
-      font-size: 16px;
-      margin-bottom: 10px;
+    h3 {
+      margin-bottom: 8px;
     }
   </style>
 </head>
 <body>
 
-  <div id="controls">
-    <button id="overviewBtn">Overview</button>
-    <button data-lat="69.69472" data-lng="18.63642" data-name="Korteidet">Korteidet</button>
-    <button data-lat="69.78386" data-lng="18.78913" data-name="Lyfjorddalen">Lyfjorddalen</button>
-    <button data-lat="69.65974" data-lng="18.95441" data-name="Valhall">Valhall</button>
-    <button id="instagramBtn">Instagram Profile</button>
+  <h1 style="margin-top:20px;">Top Rope Solo 🌍</h1>
+  <p style="max-width:800px; margin:10px auto;">
+    Explore Top Rope Solo areas in Tromsø. Select a location to see it on the map, or scroll down to watch climbing videos from the areas.
+  </p>
+
+  <div class="button-container">
+    <button class="location-btn" data-lat="69.7352" data-lng="19.0309" data-name="Korteidet">Korteidet</button>
+    <button class="location-btn" data-lat="69.7012" data-lng="18.8571" data-name="Lyfjorddalen">Lyfjorddalen</button>
+    <button class="location-btn" data-lat="69.65974" data-lng="18.95441" data-name="Valhall">Valhall</button>
+    <button id="overviewBtn" class="location-btn">Show All</button>
+    <button id="instagramBtn" class="location-btn">Instagram Profile</button>
   </div>
 
   <div id="map"></div>
@@ -88,8 +91,8 @@
     </div>
     <div class="instagram-video-block">
       <h3>Video from Lyfjorddalen</h3>
-      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DO1PCUQt1UD/" data-instgrm-version="14" style="background:#FFF; border:0; margin:0 auto; max-width:320px; width:100%; display:block;">
-        <a href="https://www.instagram.com/reel/DO1PCUQt1UD/" target="_blank" rel="noopener noreferrer"></a>
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DL8NKszNihY/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==" data-instgrm-version="14" style="background:#FFF; border:0; margin:0 auto; max-width:320px; width:100%; display:block;">
+        <a href="https://www.instagram.com/reel/DL8NKszNihY/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==" target="_blank" rel="noopener noreferrer"></a>
       </blockquote>
     </div>
     <div class="instagram-video-block">
@@ -103,56 +106,37 @@
   <script async src="//www.instagram.com/embed.js"></script>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    const map = L.map('map').setView([69.7, 18.9], 9);
+    const map = L.map('map').setView([69.7, 19.0], 10);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
+      attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
     const locations = [
-      {
-        name: 'Korteidet',
-        lat: 69.69472,
-        lng: 18.63642,
-        popup: `<strong>Korteidet</strong><br>
-                Here you can find information about Korteidet.<br>
-                <a href="https://klatreforer.tromsoklatring.no/area/3062" target="_blank" rel="noopener noreferrer">Climbing guide – Korteidet</a>`
-      },
-      {
-        name: 'Lyfjorddalen',
-        lat: 69.78386,
-        lng: 18.78913,
-        popup: `<strong>Lyfjorddalen</strong><br>
-                Here you can find information about Lyfjorddalen.<br>
-                <a href="https://klatreforer.tromsoklatring.no/area/2868" target="_blank" rel="noopener noreferrer">Climbing guide – Lyfjorddalen</a>`
-      },
-      {
-        name: 'Valhall',
-        lat: 69.65974,
-        lng: 18.95441,
-        popup: `<strong>Valhall</strong><br>
-                Here you can find information about Valhall.`
-      }
+      { name: "Korteidet", coords: [69.7352, 19.0309], popup: "<b>Korteidet</b><br>Nice climbing spot with great views." },
+      { name: "Lyfjorddalen", coords: [69.7012, 18.8571], popup: "<b>Lyfjorddalen</b><br>Beautiful climbing area in the valley." },
+      { name: "Valhall", coords: [69.65974, 18.95441], popup: "<b>Valhall</b><br>Impressive climbing location." }
     ];
 
     const markers = {};
-    const group = L.featureGroup().addTo(map);
+    const group = L.featureGroup();
 
     locations.forEach(loc => {
-      const marker = L.marker([loc.lat, loc.lng]).addTo(group).bindPopup(loc.popup);
+      const marker = L.marker(loc.coords).addTo(map).bindPopup(loc.popup);
       markers[loc.name] = marker;
+      group.addLayer(marker);
     });
 
-    map.fitBounds(group.getBounds().pad(0.2));
-
-    document.querySelectorAll('#controls button[data-lat]').forEach(button => {
+    document.querySelectorAll('.location-btn').forEach(button => {
       button.addEventListener('click', () => {
         const lat = button.getAttribute('data-lat');
         const lng = button.getAttribute('data-lng');
         const name = button.getAttribute('data-name');
 
-        map.setView([lat, lng], 15);
-        markers[name].openPopup();
+        if (name && markers[name]) {
+          map.setView([lat, lng], 15);
+          markers[name].openPopup();
+        }
       });
     });
 
