@@ -60,7 +60,7 @@
 </style>
 </head>
 <body>
-  <h1>Top Rope Solo 🌍</h1>
+  <h1>Top Rope Solo - Tromsø 🌍</h1>
   <div id="buttons">
     <button id="overviewBtn">Map overview</button>
     <button data-lat="69.69472" data-lng="18.63642" data-name="Korteidet">Korteidet</button>
@@ -70,14 +70,6 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script>
-    const map = L.map('map').setView([69.74, 18.71], 12);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
-
     const locations = [
       {
         name: 'Korteidet',
@@ -93,12 +85,24 @@
       }
     ];
 
+    const map = L.map('map');
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
     const markers = {};
 
     locations.forEach(({name, lat, lng, popup}) => {
       const marker = L.marker([lat, lng]).addTo(map).bindPopup(popup);
       markers[name] = marker;
     });
+
+    // Zoom ut til alle markører ved oppstart
+    const group = new L.featureGroup(Object.values(markers));
+    map.fitBounds(group.getBounds().pad(0.2));
 
     const buttons = document.querySelectorAll('#buttons button[data-name]');
     buttons.forEach(button => {
@@ -113,7 +117,6 @@
     });
 
     document.getElementById('overviewBtn').addEventListener('click', () => {
-      const group = new L.featureGroup(Object.values(markers));
       map.fitBounds(group.getBounds().pad(0.2));
     });
   </script>
