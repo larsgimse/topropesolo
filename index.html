@@ -77,19 +77,21 @@
     display: flex;
     justify-content: center;
     gap: 24px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;    /* Hold videoene på samme linje */
+    overflow-x: auto;     /* Tillat horisontal scroll om nødvendig */
+    padding-bottom: 10px; /* Unngå clipping ved scroll */
   }
-.instagram-video-block {
-  width: 340px;           /* litt bredere */
-  border: 1.5px solid #ccc;
-  border-radius: 12px;
-  padding: 20px;          /* mer padding */
-  margin: 12px 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  background-color: white;
-  box-sizing: border-box;
-  overflow: hidden;       /* skjuler innhold som går utenfor */
-}
+  .instagram-video-block {
+    width: 340px;           /* Passer 2 videoer side om side */
+    border: 1.5px solid #ccc;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 12px 0;         /* Fjernet horisontal margin */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    background-color: white;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
 
   .instagram-video-block h2 {
     color: #0066cc;
@@ -118,11 +120,11 @@
     }
     #instagram-video-container {
       max-width: 95vw;
-      flex-direction: column;
-      gap: 15px;
+      flex-wrap: wrap;      /* Tillat wrapping på mobil */
     }
     .instagram-video-block {
-      width: 100%;
+      width: 100%;          /* Fyll bredden på mobil */
+      margin: 12px 0;
     }
     .instagram-video-block h2 {
       font-size: 16px;
