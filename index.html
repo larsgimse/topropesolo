@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Top Rope Solo</title>
+  <title>Top Rope Solo - Tromsø</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
     body {
@@ -15,11 +15,15 @@
 
     .button-container {
       margin: 20px 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
     }
 
     .location-btn {
       padding: 14px 20px;
-      margin: 5px;
       border: none;
       border-radius: 5px;
       background-color: #007BFF;
@@ -31,6 +35,8 @@
       display: inline-flex;
       align-items: center;
       gap: 10px;
+      white-space: nowrap;
+      min-height: 44px; /* for consistent button height */
     }
 
     .location-btn:hover {
@@ -82,12 +88,18 @@
 </head>
 <body>
 
-  <h1 style="margin-top:20px;">Top Rope Solo 🌍</h1>
+  <h1 style="margin-top:20px;">Top Rope Solo - Tromsø</h1>
   <p style="max-width:800px; margin:10px auto;">
     Explore Top Rope Solo areas in Tromsø. Select a location to see it on the map, or scroll down to watch climbing videos from the areas.
   </p>
 
   <div class="button-container">
+    <button id="overviewBtn" class="location-btn" aria-label="Show all locations">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="white" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2zm5.93 6H15a7 7 0 00-6 0H6.07a8.017 8.017 0 0111.86 0zM12 20a7.96 7.96 0 01-5.95-2.95h11.9A7.96 7.96 0 0112 20zM4 12a7.962 7.962 0 012.05-5.45A15.963 15.963 0 007.15 12a15.963 15.963 0 01-1.1 5.45A7.962 7.962 0 014 12z"/>
+      </svg>
+      Show All
+    </button>
     <button class="location-btn" data-lat="69.69472" data-lng="18.63642" data-name="Korteidet" aria-label="Korteidet">
       <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M12 2L3 20h18L12 2zM12 6.5l3.5 7h-7l3.5-7z" />
@@ -105,9 +117,6 @@
         <path d="M12 2L3 20h18L12 2zM12 6.5l3.5 7h-7l3.5-7z" />
       </svg>
       Valhall
-    </button>
-    <button id="overviewBtn" class="location-btn" aria-label="Show all locations">
-      Show All
     </button>
     <button id="instagramBtn" class="location-btn" aria-label="Instagram Rope Solo Man profile">
       <svg class="icon" viewBox="0 0 24 24" fill="white" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -163,7 +172,7 @@
       { 
         name: "Valhall", 
         coords: [69.65974, 18.95441], 
-        popup: `<b>Valhall</b><br>More info coming.` 
+        popup: `<b>Valhall</b><br>Impressive climbing location.` 
       }
     ];
 
