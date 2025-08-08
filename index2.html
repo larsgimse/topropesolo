@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Top Rope Solo – Tromsø med Kartverket</title>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-sA+oM9M+dHJnkkXnSgTa+RG9x+X8kU2z5f6wQf6rmC4="
+  crossorigin=""
+/>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+    text-align: center;
+    padding: 40px 20px;
+    margin: 0;
+  }
+  h1 {
+    color: #0066cc;
+    margin-bottom: 10px;
+  }
+  #map {
+    height: 480px;
+    max-width: 800px;
+    margin: 0 auto;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    max-width: 400px;
+    margin: 0 auto 30px auto;
+    text-align: left;
+  }
+  li {
+    background: white;
+    margin: 8px 0;
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    cursor: pointer;
+  }
+  li:hover {
+    background-color: #e6f0ff;
+  }
+  @media (max-width: 600px) {
+    body {
+      padding: 20px 10px;
+    }
+    #map {
+      height: 300px;
+      max-width: 100%;
+    }
+    ul {
+      max-width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+  <h1>Top Rope Solo 🌍</h1>
+  <p>Steder rundt Tromsø for Top Rope Solo:</p>
+  <ul id="places-list">
+    <li data-lat="69.69472" data-lng="18.63642">Korteidet</li>
+    <li data-lat="69.78386" data-lng="18.78913">Lyfjorddalen</li>
+  </ul>
+  <div id="map"></div>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-o9N1jzH1kyGqLs6JEt39bDBLmEWxz5ZT1q2Fb59xjkM="
+    crossorigin=""
+  ></script>
+  <script>
+    // Initialiser kartet sentrert rundt området mellom de to punktene
+    const map = L.map('map').setView([69.74, 18.71], 12);
+
+    // Legg til Kartverket sitt topografiske kart (DOK) som bakgrunnslag
+    L.tileLayer(
+      'https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom={z}&x={x}&y={y}',
+      {
+        maxZoom: 18,
+        attribution:
+          '&copy; <a href="https://www.kartverket.no/">Kartverket</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      }
+    ).addTo(map);
+
+    // Marker steder og legg til popup + klikk i liste
+    const places = document.querySelectorAll('#places-list li');
+
+    places.forEach((place) => {
+      const lat = place.dataset.lat;
+      const lng = place.dataset.lng;
+
+      const marker = L.marker([lat, lng]).addTo(map);
+      marker.bindPopup(place.textContent);
+
+      place.addEventListener('click', () => {
+        map.setView([lat, lng], 15);
+        marker.openPopup();
+      });
+    });
+  </script>
+</body>
+</html>
