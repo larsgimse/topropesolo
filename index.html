@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Top Rope Solo</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
@@ -18,13 +18,16 @@
     }
 
     .location-btn {
-      padding: 10px 15px;
+      padding: 14px 20px;
       margin: 5px;
       border: none;
       border-radius: 5px;
       background-color: #007BFF;
       color: white;
       cursor: pointer;
+      font-size: 18px;
+      font-weight: 600;
+      transition: background-color 0.3s;
     }
 
     .location-btn:hover {
@@ -73,8 +76,8 @@
   </p>
 
   <div class="button-container">
-    <button class="location-btn" data-lat="69.7352" data-lng="19.0309" data-name="Korteidet">Korteidet</button>
-    <button class="location-btn" data-lat="69.7012" data-lng="18.8571" data-name="Lyfjorddalen">Lyfjorddalen</button>
+    <button class="location-btn" data-lat="69.69472" data-lng="18.63642" data-name="Korteidet">Korteidet</button>
+    <button class="location-btn" data-lat="69.78386" data-lng="18.78913" data-name="Lyfjorddalen">Lyfjorddalen</button>
     <button class="location-btn" data-lat="69.65974" data-lng="18.95441" data-name="Valhall">Valhall</button>
     <button id="overviewBtn" class="location-btn">Show All</button>
     <button id="instagramBtn" class="location-btn">Instagram Profile</button>
@@ -113,9 +116,21 @@
     }).addTo(map);
 
     const locations = [
-      { name: "Korteidet", coords: [69.7352, 19.0309], popup: "<b>Korteidet</b><br>Nice climbing spot with great views." },
-      { name: "Lyfjorddalen", coords: [69.7012, 18.8571], popup: "<b>Lyfjorddalen</b><br>Beautiful climbing area in the valley." },
-      { name: "Valhall", coords: [69.65974, 18.95441], popup: "<b>Valhall</b><br>Impressive climbing location." }
+      { 
+        name: "Korteidet", 
+        coords: [69.69472, 18.63642], 
+        popup: `<b>Korteidet</b><br>More info coming.<br><a href="https://klatreforer.tromsoklatring.no/area/3062" target="_blank" rel="noopener noreferrer">Climbingarea - Korteidet</a>`
+      },
+      { 
+        name: "Lyfjorddalen", 
+        coords: [69.78386, 18.78913], 
+        popup: `<b>Lyfjorddalen</b><br>More info coming.<br><a href="https://klatreforer.tromsoklatring.no/area/2868" target="_blank" rel="noopener noreferrer">Climbingarea - Lyfjorddalen</a>`
+      },
+      { 
+        name: "Valhall", 
+        coords: [69.65974, 18.95441], 
+        popup: `<b>Valhall</b><br>Impressive climbing location.` 
+      }
     ];
 
     const markers = {};
@@ -129,8 +144,8 @@
 
     document.querySelectorAll('.location-btn').forEach(button => {
       button.addEventListener('click', () => {
-        const lat = button.getAttribute('data-lat');
-        const lng = button.getAttribute('data-lng');
+        const lat = parseFloat(button.getAttribute('data-lat'));
+        const lng = parseFloat(button.getAttribute('data-lng'));
         const name = button.getAttribute('data-name');
 
         if (name && markers[name]) {
