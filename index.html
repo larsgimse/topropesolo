@@ -1,242 +1,164 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Top Rope Solo – Tromsø</title>
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  crossorigin=""
-/>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f4f8;
-    color: #333;
-    text-align: center;
-    padding: 20px;
-    margin: 0;
-  }
-  h1 {
-    color: #0066cc;
-    margin-bottom: 10px;
-  }
-  #info-text {
-    max-width: 800px;
-    margin: 0 auto 20px auto;
-    font-size: 18px;
-    color: #444;
-  }
-  #buttons {
-    margin-bottom: 15px;
-  }
-  button {
-    background-color: #0066cc;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 18px;
-    margin: 0 8px 8px 0;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  button:hover {
-    background-color: #004a99;
-  }
-  #map {
-    height: 500px;
-    width: 80vw;
-    max-width: 800px;
-    margin: 0 auto 20px auto;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  }
-  #instagramBtn {
-    background-color: #e1306c; /* Instagram pink */
-    margin-top: 10px;
-  }
-  #instagramBtn:hover {
-    background-color: #b92e58;
-  }
-  #instagram-text {
-    max-width: 800px;
-    margin: 8px auto 0 auto;
-    font-size: 16px;
-    color: #555;
-  }
-  /* Felles ramme rundt videoene med symmetrisk padding */
-  #instagram-video-container {
-    max-width: 800px;
-    margin: 20px auto 0 auto;
-    padding: 15px 24px;
-    border: 2px solid #ccc;
-    border-radius: 12px;
-    background-color: white;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Climbing Map and Videos</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
 
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-  }
-  .instagram-video-block {
-    width: 340px;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    box-sizing: border-box;
-    background-color: white;
-    flex-shrink: 0;
-    overflow: hidden;
-    margin: 0;
-  }
-  .instagram-video-block:first-child {
-    margin-left: 0;
-  }
-  .instagram-video-block:last-child {
-    margin-right: 0;
-  }
-
-  .instagram-video-block h2 {
-    color: #0066cc;
-    margin-bottom: 8px;
-    font-size: 18px;
-  }
-  .instagram-video-block blockquote {
-    background: #FFF;
-    border: 0;
-    margin: 0 auto;
-    width: 100%;
-    padding: 0;
-    box-shadow: none;
-  }
-  @media (max-width: 600px) {
     #map {
-      width: 95vw;
-      height: 350px;
-    }
-    button {
-      font-size: 14px;
-      padding: 8px 14px;
-    }
-    #instagram-text {
-      font-size: 14px;
-    }
-    #instagram-video-container {
-      max-width: 95vw;
-      flex-direction: column;
-      gap: 15px;
-      padding: 15px 12px;
-      overflow-x: visible;
-    }
-    .instagram-video-block {
+      height: 500px;
       width: 100%;
     }
-    .instagram-video-block h2 {
-      font-size: 16px;
+
+    #controls {
+      text-align: center;
+      margin: 20px 0;
     }
-  }
-</style>
+
+    #controls button {
+      padding: 10px 15px;
+      margin: 5px;
+      border: none;
+      border-radius: 6px;
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    #controls button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Updated container for videos */
+    #instagram-video-container {
+      max-width: 1200px; /* wider to fit 3 videos */
+      margin: 20px auto 0 auto;
+      padding: 15px 24px;
+      border: 2px solid #ccc;
+      border-radius: 12px;
+      background-color: white;
+
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap; /* allows wrapping on small screens */
+    }
+
+    .instagram-video-block {
+      width: 340px;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+      background-color: white;
+      flex-shrink: 0;
+      overflow: hidden;
+      margin: 0;
+    }
+
+    .instagram-video-block h3 {
+      text-align: center;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    /* Remove margin on first and last for symmetry */
+    .instagram-video-block:first-child {
+      margin-left: 0;
+    }
+    .instagram-video-block:last-child {
+      margin-right: 0;
+    }
+  </style>
 </head>
 <body>
-  <h1>Top Rope Solo - Tromsø 🧗‍♂️</h1>
 
-  <div id="info-text">
-    On this page, you will find information about places around Tromsø where Top Rope Solo is possible. The page will be updated continuously.
-  </div>
-
-  <div id="buttons">
-    <button id="overviewBtn">Map overview</button>
+  <div id="controls">
+    <button id="overviewBtn">Overview</button>
     <button data-lat="69.69472" data-lng="18.63642" data-name="Korteidet">Korteidet</button>
-    <button data-lat="69.65974" data-lng="18.95441" data-name="Valhall">Valhall</button>
     <button data-lat="69.78386" data-lng="18.78913" data-name="Lyfjorddalen">Lyfjorddalen</button>
+    <button data-lat="69.65974" data-lng="18.95441" data-name="Valhall">Valhall</button>
+    <button id="instagramBtn">Instagram Profile</button>
   </div>
 
   <div id="map"></div>
 
-  <button id="instagramBtn" aria-label="Instagram profile Rope Solo Man">
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 2A3.75 3.75 0 004 7.75v8.5A3.75 3.75 0 007.75 20h8.5a3.75 3.75 0 003.75-3.75v-8.5A3.75 3.75 0 0016.25 4h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6zm4.5-3.5a1.25 1.25 0 110 2.5 1.25 1.25 0 010-2.5z"/>
-    </svg>
-    Rope Solo Man
-  </button>
-
-  <div id="instagram-text">
-    You can see pictures and video from Top Rope Solo on this profile
-  </div>
-
   <div id="instagram-video-container">
     <div class="instagram-video-block">
-      <h2>Video from Korteidet</h2>
-      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DKxCoz_tbzW/" data-instgrm-version="14"></blockquote>
+      <h3>Video from Korteidet</h3>
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DKxCoz_tbzW/" data-instgrm-version="14" style="background:#FFF; border:0; margin:0 auto; max-width:320px; width:100%; display:block;">
+        <a href="https://www.instagram.com/reel/DKxCoz_tbzW/" target="_blank" rel="noopener noreferrer"></a>
+      </blockquote>
     </div>
-
     <div class="instagram-video-block">
-      <h2>Video from Lyfjorddalen</h2>
-      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DL8NKszNihY/" data-instgrm-version="14"></blockquote>
+      <h3>Video from Lyfjorddalen</h3>
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DO1PCUQt1UD/" data-instgrm-version="14" style="background:#FFF; border:0; margin:0 auto; max-width:320px; width:100%; display:block;">
+        <a href="https://www.instagram.com/reel/DO1PCUQt1UD/" target="_blank" rel="noopener noreferrer"></a>
+      </blockquote>
     </div>
-
     <div class="instagram-video-block">
-      <h2>Video from Valhall</h2>
-      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DLU4pwkt80j/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==" data-instgrm-version="14"></blockquote>
+      <h3>Video from Valhall</h3>
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DLU4pwkt80j/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==" data-instgrm-version="14" style="background:#FFF; border:0; margin:0 auto; max-width:320px; width:100%; display:block;">
+        <a href="https://www.instagram.com/reel/DLU4pwkt80j/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==" target="_blank" rel="noopener noreferrer"></a>
+      </blockquote>
     </div>
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script async src="//www.instagram.com/embed.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
+    const map = L.map('map').setView([69.7, 18.9], 9);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
     const locations = [
       {
         name: 'Korteidet',
         lat: 69.69472,
         lng: 18.63642,
-        popup: "<strong>Korteidet</strong><br>" +
-               "More information about Korteidet will come here.<br>" +
-               '<a href="https://klatreforer.tromsoklatring.no/area/3062" target="_blank" rel="noopener noreferrer">Climbing guide - Korteidet</a>'
-      },
-      {
-        name: 'Valhall',
-        lat: 69.65974,
-        lng: 18.95441,
-        popup: "<strong>Valhall</strong><br>" +
-               "More information about Valhall will come here."
+        popup: `<strong>Korteidet</strong><br>
+                Here you can find information about Korteidet.<br>
+                <a href="https://klatreforer.tromsoklatring.no/area/3062" target="_blank" rel="noopener noreferrer">Climbing guide – Korteidet</a>`
       },
       {
         name: 'Lyfjorddalen',
         lat: 69.78386,
         lng: 18.78913,
-        popup: "<strong>Lyfjorddalen</strong><br>" +
-               "More information about Lyfjorddalen will come here.<br>" +
-               '<a href="https://klatreforer.tromsoklatring.no/area/2868" target="_blank" rel="noopener noreferrer">Climbing guide - Lyfjorddalen</a>'
+        popup: `<strong>Lyfjorddalen</strong><br>
+                Here you can find information about Lyfjorddalen.<br>
+                <a href="https://klatreforer.tromsoklatring.no/area/2868" target="_blank" rel="noopener noreferrer">Climbing guide – Lyfjorddalen</a>`
+      },
+      {
+        name: 'Valhall',
+        lat: 69.65974,
+        lng: 18.95441,
+        popup: `<strong>Valhall</strong><br>
+                Here you can find information about Valhall.`
       }
     ];
 
-    const map = L.map('map');
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
-
     const markers = {};
+    const group = L.featureGroup().addTo(map);
 
-    locations.forEach(({name, lat, lng, popup}) => {
-      const marker = L.marker([lat, lng]).addTo(map).bindPopup(popup);
-      markers[name] = marker;
+    locations.forEach(loc => {
+      const marker = L.marker([loc.lat, loc.lng]).addTo(group).bindPopup(loc.popup);
+      markers[loc.name] = marker;
     });
 
-    // Zoom out to show all markers initially
-    const group = new L.featureGroup(Object.values(markers));
     map.fitBounds(group.getBounds().pad(0.2));
 
-    const buttons = document.querySelectorAll('#buttons button[data-name]');
-    buttons.forEach(button => {
+    document.querySelectorAll('#controls button[data-lat]').forEach(button => {
       button.addEventListener('click', () => {
         const lat = button.getAttribute('data-lat');
         const lng = button.getAttribute('data-lng');
