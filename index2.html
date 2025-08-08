@@ -22,6 +22,12 @@
     color: #0066cc;
     margin-bottom: 10px;
   }
+  #info-text {
+    max-width: 800px;
+    margin: 0 auto 20px auto;
+    font-size: 18px;
+    color: #444;
+  }
   #buttons {
     margin-bottom: 15px;
   }
@@ -35,6 +41,9 @@
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
   button:hover {
     background-color: #004a99;
@@ -43,9 +52,22 @@
     height: 500px;
     width: 80vw;
     max-width: 800px;
-    margin: 0 auto;
+    margin: 0 auto 20px auto;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  #instagramBtn {
+    background-color: #e1306c; /* Instagram pink */
+    margin-top: 10px;
+  }
+  #instagramBtn:hover {
+    background-color: #b92e58;
+  }
+  #instagram-text {
+    max-width: 800px;
+    margin: 8px auto 0 auto;
+    font-size: 16px;
+    color: #555;
   }
   @media (max-width: 600px) {
     #map {
@@ -56,17 +78,37 @@
       font-size: 14px;
       padding: 8px 14px;
     }
+    #instagram-text {
+      font-size: 14px;
+    }
   }
 </style>
 </head>
 <body>
   <h1>Top Rope Solo - Tromsø 🌍</h1>
+
+  <div id="info-text">
+    On this page, you will find information about places around Tromsø where Top Rope Solo is possible. The page will be updated continuously.
+  </div>
+
   <div id="buttons">
     <button id="overviewBtn">Map overview</button>
     <button data-lat="69.69472" data-lng="18.63642" data-name="Korteidet">Korteidet</button>
     <button data-lat="69.78386" data-lng="18.78913" data-name="Lyfjorddalen">Lyfjorddalen</button>
   </div>
+
   <div id="map"></div>
+
+  <button id="instagramBtn" aria-label="Instagram profile Rope Solo Man">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 2A3.75 3.75 0 004 7.75v8.5A3.75 3.75 0 007.75 20h8.5a3.75 3.75 0 003.75-3.75v-8.5A3.75 3.75 0 0016.25 4h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6zm4.5-3.5a1.25 1.25 0 110 2.5 1.25 1.25 0 010-2.5z"/>
+    </svg>
+    Rope Solo Man
+  </button>
+
+  <div id="instagram-text">
+    You can see pictures and video from Top Rope Solo on this profile
+  </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script>
@@ -118,6 +160,10 @@
 
     document.getElementById('overviewBtn').addEventListener('click', () => {
       map.fitBounds(group.getBounds().pad(0.2));
+    });
+
+    document.getElementById('instagramBtn').addEventListener('click', () => {
+      window.open('https://www.instagram.com/rope.solo.man/', '_blank');
     });
   </script>
 </body>
