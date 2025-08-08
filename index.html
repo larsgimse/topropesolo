@@ -70,23 +70,24 @@
     color: #555;
   }
   #instagram-video-container {
-    max-width: 540px;
+    max-width: 720px;
     margin: 20px auto 0 auto;
     text-align: center;
 
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 24px;
     flex-wrap: wrap;
   }
   .instagram-video-block {
-    width: 260px; /* smalere video */
+    width: 320px;           /* økt bredde */
     border: 1.5px solid #ccc;
     border-radius: 12px;
-    padding: 12px;
+    padding: 16px;          /* økt padding */
     margin: 8px 0;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     background-color: white;
+    box-sizing: border-box;
   }
   .instagram-video-block h2 {
     color: #0066cc;
@@ -173,13 +174,17 @@
         name: 'Korteidet',
         lat: 69.69472,
         lng: 18.63642,
-        popup: '<strong>Korteidet</strong><br>Her kommer det mer informasjon om Korteidet.'
+        popup: `<strong>Korteidet</strong><br>
+                Her kommer det mer informasjon om Korteidet.<br>
+                <a href="https://klatreforer.tromsoklatring.no/area/3062" target="_blank" rel="noopener noreferrer">Klatrefører - Korteidet</a>`
       },
       {
         name: 'Lyfjorddalen',
         lat: 69.78386,
         lng: 18.78913,
-        popup: '<strong>Lyfjorddalen</strong><br>Her kommer det mer informasjon om Lyfjorddalen.'
+        popup: `<strong>Lyfjorddalen</strong><br>
+                Her kommer det mer informasjon om Lyfjorddalen.<br>
+                <a href="https://klatreforer.tromsoklatring.no/area/2868" target="_blank" rel="noopener noreferrer">Klatrefører - Lyfjorddalen</a>`
       }
     ];
 
