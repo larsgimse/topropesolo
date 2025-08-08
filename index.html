@@ -69,13 +69,15 @@
     font-size: 16px;
     color: #555;
   }
+  /* Felles ramme rundt videoene med symmetrisk padding */
   #instagram-video-container {
     max-width: 800px;
     margin: 20px auto 0 auto;
-    padding: 15px;
-    border: 2px solid #ccc; /* felles ramme */
+    padding: 15px 24px;
+    border: 2px solid #ccc;
     border-radius: 12px;
     background-color: white;
+
     display: flex;
     justify-content: center;
     gap: 24px;
@@ -84,7 +86,6 @@
   }
   .instagram-video-block {
     width: 340px;
-    /* border: 1.5px solid #ccc; */ /* fjernet denne */
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
@@ -92,7 +93,15 @@
     background-color: white;
     flex-shrink: 0;
     overflow: hidden;
+    margin: 0;
   }
+  .instagram-video-block:first-child {
+    margin-left: 0;
+  }
+  .instagram-video-block:last-child {
+    margin-right: 0;
+  }
+
   .instagram-video-block h2 {
     color: #0066cc;
     margin-bottom: 8px;
@@ -122,6 +131,7 @@
       max-width: 95vw;
       flex-direction: column;
       gap: 15px;
+      padding: 15px 12px;
       overflow-x: visible;
     }
     .instagram-video-block {
@@ -143,6 +153,7 @@
   <div id="buttons">
     <button id="overviewBtn">Map overview</button>
     <button data-lat="69.69472" data-lng="18.63642" data-name="Korteidet">Korteidet</button>
+    <button data-lat="69.65974" data-lng="18.95441" data-name="Valhall">Valhall</button>
     <button data-lat="69.78386" data-lng="18.78913" data-name="Lyfjorddalen">Lyfjorddalen</button>
   </div>
 
@@ -179,17 +190,24 @@
         name: 'Korteidet',
         lat: 69.69472,
         lng: 18.63642,
-        popup: `<strong>Korteidet</strong><br>
-                Here you can find information about Korteidet.<br>
-                <a href="https://klatreforer.tromsoklatring.no/area/3062" target="_blank" rel="noopener noreferrer">Climbing guide – Korteidet</a>`
+        popup: "<strong>Korteidet</strong><br>" +
+               "More information about Korteidet will come here.<br>" +
+               '<a href="https://klatreforer.tromsoklatring.no/area/3062" target="_blank" rel="noopener noreferrer">Climbing guide - Korteidet</a>'
+      },
+      {
+        name: 'Valhall',
+        lat: 69.65974,
+        lng: 18.95441,
+        popup: "<strong>Valhall</strong><br>" +
+               "More information about Valhall will come here."
       },
       {
         name: 'Lyfjorddalen',
         lat: 69.78386,
         lng: 18.78913,
-        popup: `<strong>Lyfjorddalen</strong><br>
-                Here you can find information about Lyfjorddalen.<br>
-                <a href="https://klatreforer.tromsoklatring.no/area/2868" target="_blank" rel="noopener noreferrer">Climbing guide – Lyfjorddalen</a>`
+        popup: "<strong>Lyfjorddalen</strong><br>" +
+               "More information about Lyfjorddalen will come here.<br>" +
+               '<a href="https://klatreforer.tromsoklatring.no/area/2868" target="_blank" rel="noopener noreferrer">Climbing guide - Lyfjorddalen</a>'
       }
     ];
 
@@ -208,7 +226,7 @@
       markers[name] = marker;
     });
 
-    // Zoom out to all markers at start
+    // Zoom out to show all markers initially
     const group = new L.featureGroup(Object.values(markers));
     map.fitBounds(group.getBounds().pad(0.2));
 
@@ -229,4 +247,8 @@
     });
 
     document.getElementById('instagramBtn').addEventListener('click', () => {
-      window.open('https://www.instagram.com/rope.solo
+      window.open('https://www.instagram.com/ropesoloman', '_blank');
+    });
+  </script>
+</body>
+</html>
