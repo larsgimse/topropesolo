@@ -69,6 +69,15 @@
     font-size: 16px;
     color: #555;
   }
+  #instagram-video-container {
+    max-width: 540px;
+    margin: 20px auto 0 auto;
+    text-align: center;
+  }
+  #instagram-video-container h2 {
+    color: #0066cc;
+    margin-bottom: 12px;
+  }
   @media (max-width: 600px) {
     #map {
       width: 95vw;
@@ -80,6 +89,9 @@
     }
     #instagram-text {
       font-size: 14px;
+    }
+    #instagram-video-container {
+      max-width: 95vw;
     }
   }
 </style>
@@ -110,7 +122,14 @@
     You can see pictures and video from Top Rope Solo on this profile
   </div>
 
+  <div id="instagram-video-container">
+    <h2>Video from Lyfjorddalen</h2>
+    <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DL8NKszNihY/" data-instgrm-version="14" style=" background:#FFF; border:0; margin: 0 auto; max-width:540px; width:100%; padding:0; box-shadow:none;">
+    </blockquote>
+  </div>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script async src="//www.instagram.com/embed.js"></script>
   <script>
     const locations = [
       {
