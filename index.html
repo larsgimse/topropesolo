@@ -66,12 +66,6 @@
   #instagramBtn:hover {
     background-color: #b92e58;
   }
-  #instagram-text {
-    max-width: 800px;
-    margin: 8px auto 0 auto;
-    font-size: 16px;
-    color: #555;
-  }
   #instagram-video-container {
     max-width: 95vw;
     margin: 20px auto 0 auto;
@@ -113,9 +107,6 @@
       font-size: 16px;
       padding: 10px 16px;
     }
-    #instagram-text {
-      font-size: 14px;
-    }
     #instagram-video-container {
       max-width: 95vw;
       flex-direction: column;
@@ -145,13 +136,6 @@
   </div>
 
   <div id="buttons">
-    <button id="overviewBtn" class="location-btn" aria-label="Show all locations">
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
-        <path d="M15 18l-6-6 6-6"/>
-      </svg>
-      Show All
-    </button>
-
     <button data-lat="69.69472" data-lng="18.63642" data-name="Korteidet" class="location-btn" aria-label="Korteidet">
       <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 2L15 8l6 1-4 4 1 6-5-3-5 3 1-6-4-4 6-1 3-6z"/>
@@ -172,6 +156,13 @@
       </svg>
       Valhall
     </button>
+
+    <button id="overviewBtn" aria-label="Show all locations">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+      Show All
+    </button>
   </div>
 
   <button id="instagramBtn" aria-label="Instagram profile Rope Solo Man">
@@ -180,10 +171,6 @@
     </svg>
     Rope Solo Man
   </button>
-
-  <div id="instagram-text">
-    You can see pictures and video from Top Rope Solo on this profile
-  </div>
 
   <div id="instagram-video-container">
     <div class="instagram-video-block">
