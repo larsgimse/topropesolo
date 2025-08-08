@@ -73,10 +73,27 @@
     max-width: 540px;
     margin: 20px auto 0 auto;
     text-align: center;
+
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
   }
-  #instagram-video-container h2 {
+  .instagram-video-block {
+    width: 260px; /* smalere video */
+  }
+  .instagram-video-block h2 {
     color: #0066cc;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
+    font-size: 18px;
+  }
+  .instagram-video-block blockquote {
+    background: #FFF;
+    border: 0;
+    margin: 0 auto;
+    width: 100%;
+    padding: 0;
+    box-shadow: none;
   }
   @media (max-width: 600px) {
     #map {
@@ -92,12 +109,20 @@
     }
     #instagram-video-container {
       max-width: 95vw;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .instagram-video-block {
+      width: 100%;
+    }
+    .instagram-video-block h2 {
+      font-size: 16px;
     }
   }
 </style>
 </head>
 <body>
-  <h1>Top Rope Solo - Tromsø 🌍</h1>
+  <h1>Top Rope Solo - Tromsø 🧗‍♂️</h1>
 
   <div id="info-text">
     On this page, you will find information about places around Tromsø where Top Rope Solo is possible. The page will be updated continuously.
@@ -123,13 +148,15 @@
   </div>
 
   <div id="instagram-video-container">
-    <h2>Video from Korteidet</h2>
-    <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DKxCoz_tbzW/" data-instgrm-version="14" style=" background:#FFF; border:0; margin: 0 auto 20px auto; max-width:540px; width:100%; padding:0; box-shadow:none;">
-    </blockquote>
+    <div class="instagram-video-block">
+      <h2>Video from Korteidet</h2>
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DKxCoz_tbzW/" data-instgrm-version="14"></blockquote>
+    </div>
 
-    <h2>Video from Lyfjorddalen</h2>
-    <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DL8NKszNihY/" data-instgrm-version="14" style=" background:#FFF; border:0; margin: 0 auto; max-width:540px; width:100%; padding:0; box-shadow:none;">
-    </blockquote>
+    <div class="instagram-video-block">
+      <h2>Video from Lyfjorddalen</h2>
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DL8NKszNihY/" data-instgrm-version="14"></blockquote>
+    </div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
