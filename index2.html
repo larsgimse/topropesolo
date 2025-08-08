@@ -62,8 +62,9 @@
 <body>
   <h1>Top Rope Solo 🌍</h1>
   <div id="buttons">
-    <button data-lat="69.69472" data-lng="18.63642">Korteidet</button>
-    <button data-lat="69.78386" data-lng="18.78913">Lyfjorddalen</button>
+    <button id="overviewBtn">Map overview</button>
+    <button data-lat="69.69472" data-lng="18.63642" data-name="Korteidet">Korteidet</button>
+    <button data-lat="69.78386" data-lng="18.78913" data-name="Lyfjorddalen">Lyfjorddalen</button>
   </div>
   <div id="map"></div>
 
@@ -78,28 +79,42 @@
     }).addTo(map);
 
     const locations = [
-      { name: 'Korteidet', lat: 69.69472, lng: 18.63642 },
-      { name: 'Lyfjorddalen', lat: 69.78386, lng: 18.78913 }
+      {
+        name: 'Korteidet',
+        lat: 69.69472,
+        lng: 18.63642,
+        popup: '<strong>Korteidet</strong><br>Her kommer det mer informasjon om Korteidet.'
+      },
+      {
+        name: 'Lyfjorddalen',
+        lat: 69.78386,
+        lng: 18.78913,
+        popup: '<strong>Lyfjorddalen</strong><br>Her kommer det mer informasjon om Lyfjorddalen.'
+      }
     ];
 
     const markers = {};
 
-    locations.forEach(({name, lat, lng}) => {
-      const popupContent = `<strong>${name}</strong><br>Her kommer det mer informasjon`;
-      const marker = L.marker([lat, lng]).addTo(map).bindPopup(popupContent);
+    locations.forEach(({name, lat, lng, popup}) => {
+      const marker = L.marker([lat, lng]).addTo(map).bindPopup(popup);
       markers[name] = marker;
     });
 
-    const buttons = document.querySelectorAll('#buttons button');
+    const buttons = document.querySelectorAll('#buttons button[data-name]');
     buttons.forEach(button => {
       button.addEventListener('click', () => {
         const lat = button.getAttribute('data-lat');
         const lng = button.getAttribute('data-lng');
-        const name = button.textContent;
+        const name = button.getAttribute('data-name');
 
         map.setView([lat, lng], 15);
         markers[name].openPopup();
       });
+    });
+
+    document.getElementById('overviewBtn').addEventListener('click', () => {
+      const group = new L.featureGroup(Object.values(markers));
+      map.fitBounds(group.getBounds().pad(0.2));
     });
   </script>
 </body>
