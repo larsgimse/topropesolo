@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Top Rope Solo – Tromsø med Kartverket</title>
+<title>Top Rope Solo – Tromsø</title>
 <link
   rel="stylesheet"
   href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -77,20 +77,14 @@
     crossorigin=""
   ></script>
   <script>
-    // Initialiser kartet sentrert rundt området mellom de to punktene
     const map = L.map('map').setView([69.74, 18.71], 12);
 
-    // Legg til Kartverket sitt topografiske kart (DOK) som bakgrunnslag
-    L.tileLayer(
-      'https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom={z}&x={x}&y={y}',
-      {
-        maxZoom: 18,
-        attribution:
-          '&copy; <a href="https://www.kartverket.no/">Kartverket</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      }
-    ).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
 
-    // Marker steder og legg til popup + klikk i liste
     const places = document.querySelectorAll('#places-list li');
 
     places.forEach((place) => {
