@@ -123,7 +123,6 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script>
-    // Koordinater og zoom for Valhall fra index4.html
     const map = L.map('map').setView([69.65974, 18.95441], 15);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -144,7 +143,7 @@
       popupAnchor: [0, -22]
     });
 
-    L.marker([69.71417, 18.64167], { icon: mountainIcon }).addTo(map).bindPopup('<strong>Valhall</strong>');
+    L.marker([69.65974, 18.95441], { icon: mountainIcon }).addTo(map).bindPopup('<strong><a href="valhall.html">Valhall</a></strong>');
 
     // Gå tilbake til index.html ved klikk på back-knapp
     document.getElementById('backBtn').addEventListener('click', () => {
