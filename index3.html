@@ -37,7 +37,7 @@
   }
   button {
     background-color: #0066cc;
-    color: white; /* standard farge for ikoner og tekst */
+    color: white;
     border: none;
     border-radius: 6px;
     padding: 12px 20px;
@@ -51,36 +51,35 @@
   button:hover {
     background-color: #004a99;
   }
-  #map {
-    height: 500px;
-    width: 60vw; /* Endret fra 100vw til 60vw */
-    max-width: 100%;
-    margin: 0 auto; /* sentrerer kartet horisontalt */
-    border-radius: 0;
-    box-shadow: none;
-  }
-  /* Fjell-ikon stil - fjernet fill her for å bruke fill i SVG */
-  .mountain-icon {
-    width: 22px;
-    height: 22px;
-  }
-
-  /* Instagram knapp styling */
   #instagramBtn {
     background-color: #e1306c; /* Instagram pink */
     margin: 0;
-    color: white; /* sikrer ikonfarge */
+    color: white;
   }
   #instagramBtn:hover {
     background-color: #b92e58;
   }
-  /* Video container med lys bakgrunn og rundede hjørner */
+  #map {
+    height: 500px;
+    width: 60vw;
+    max-width: 100%;
+    margin: 0 auto 20px auto;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  /* Fjell-ikon stil */
+  .mountain-icon {
+    width: 22px;
+    height: 22px;
+    fill: #0066cc;
+  }
+
+  /* Video container uten indre ramme */
   #instagram-video-container {
     max-width: 960px;
     margin: 30px auto 0 auto;
-    padding: 18px 16px;
+    padding: 0;
     background-color: #fafafa;
-    border: 1.5px solid #ddd;
     border-radius: 14px;
     display: flex;
     justify-content: center;
@@ -92,13 +91,13 @@
     border-radius: 12px;
     overflow: hidden;
     background-color: white;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-    padding: 12px;
+    box-shadow: none;
+    padding: 0;
     box-sizing: border-box;
   }
   .instagram-video-block h2 {
     color: #0066cc;
-    margin-bottom: 8px;
+    margin: 10px 0 8px 0;
     font-size: 18px;
   }
   .instagram-video-block blockquote {
@@ -109,7 +108,7 @@
   @media (max-width: 960px) {
     #instagram-video-container {
       max-width: 100%;
-      padding: 14px 10px;
+      padding: 0;
     }
     .instagram-video-block {
       width: 45vw;
@@ -145,29 +144,29 @@
   </div>
 
   <div id="buttons">
-    <button id="overviewBtn" aria-label="Show all locations" style="color:white;">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" height="20" width="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <button id="overviewBtn" aria-label="Show all locations">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="white" height="20" width="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
       </svg>
       Show all
     </button>
 
-    <button data-lat="69.69472" data-lng="18.63642" data-name="Korteidet" aria-label="Show Korteidet location" style="color:#0066cc;">
-      <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false">
+    <button data-lat="69.69472" data-lng="18.63642" data-name="Korteidet" aria-label="Show Korteidet location">
+      <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
       </svg>
       Korteidet
     </button>
 
-    <button data-lat="69.78386" data-lng="18.78913" data-name="Lyfjorddalen" aria-label="Show Lyfjorddalen location" style="color:#0066cc;">
-      <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false">
+    <button data-lat="69.78386" data-lng="18.78913" data-name="Lyfjorddalen" aria-label="Show Lyfjorddalen location">
+      <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
       </svg>
       Lyfjorddalen
     </button>
 
-    <button data-lat="69.65974" data-lng="18.95441" data-name="Valhall" aria-label="Show Valhall location" style="color:#0066cc;">
-      <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false">
+    <button data-lat="69.65974" data-lng="18.95441" data-name="Valhall" aria-label="Show Valhall location">
+      <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
       </svg>
       Valhall
