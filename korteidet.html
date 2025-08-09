@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Korteidet - Kartutsnitt</title>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  crossorigin=""
+/>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  #map {
+    width: 20vw;
+    height: 20vw; /* kvadratisk */
+    min-width: 200px; /* for å unngå for liten på smale skjermer */
+    min-height: 200px;
+    border: 1.5px solid #ddd;
+    border-radius: 12px;
+  }
+  #info {
+    max-width: 60vw;
+  }
+  #info h1 {
+    margin-top: 0;
+    color: #0066cc;
+  }
+  #info p {
+    font-size: 18px;
+    color: #444;
+    line-height: 1.5;
+  }
+  @media (max-width: 700px) {
+    body {
+      flex-direction: column;
+      align-items: center;
+    }
+    #map {
+      width: 60vw;
+      height: 60vw;
+      min-width: unset;
+      min-height: unset;
+    }
+    #info {
+      max-width: 90vw;
+      margin-top: 20px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="info">
+    <h1>Korteidet</h1>
+    <p>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+      Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    </p>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script>
+    const map = L.map('map').setView([69.69472, 18.63642], 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    const mountainIcon = L.divIcon({
+      html: `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="black" aria-hidden="true" focusable="false">
+          <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
+        </svg>
+      `,
+      className: '',
+      iconSize: [22, 22],
+      iconAnchor: [11, 22],
+      popupAnchor: [0, -22]
+    });
+
+    L.marker([69.69472, 18.63642], { icon: mountainIcon }).addTo(map).bindPopup('<strong>Korteidet</strong>').openPopup();
+  </script>
+</body>
+</html>
