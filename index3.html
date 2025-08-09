@@ -1,124 +1,276 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
-<meta charset="UTF-8">
-<title>Climbing Map</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Top Rope Solo - Tromsø</title>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  crossorigin=""
+/>
 <style>
   body {
     font-family: Arial, sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+    text-align: center;
+    padding: 20px 10px 40px;
     margin: 0;
-    background: #f4f4f4;
   }
-
-  /* Map container frame */
-  #map {
-    height: 70vh; /* 70% of viewport height */
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-    border: 2px solid #ccc;
+  h1 {
+    color: #0066cc;
+    margin-bottom: 10px;
   }
-
-  /* Buttons */
-  .button-container {
+  #info-text {
+    max-width: 800px;
+    margin: 0 auto 20px auto;
+    font-size: 18px;
+    color: #444;
+  }
+  #buttons {
+    margin-bottom: 20px;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    padding: 10px;
     justify-content: center;
+    gap: 12px;
   }
-
-  .button-container button {
-    display: flex;
-    align-items: center;
-    gap: 6px; /* space between icon and text */
-    padding: 8px 14px;
-    background: #0066cc;
+  button {
+    background-color: #0066cc;
+    color: white; /* standard farge for ikoner og tekst */
     border: none;
-    color: white;
     border-radius: 6px;
-    font-size: 14px;
+    padding: 12px 20px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    font-size: 17px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s;
+  }
+  button:hover {
+    background-color: #004a99;
+  }
+  #map {
+    height: 500px;
+    width: 60vw; /* Endret fra 100vw til 60vw */
+    max-width: 100%;
+    margin: 0 auto; /* sentrerer kartet horisontalt */
+    border-radius: 0;
+    box-shadow: none;
+  }
+  /* Fjell-ikon stil - fjernet fill her for å bruke fill i SVG */
+  .mountain-icon {
+    width: 22px;
+    height: 22px;
   }
 
-  .button-container button:hover {
-    background: #004c99;
+  /* Instagram knapp styling */
+  #instagramBtn {
+    background-color: #e1306c; /* Instagram pink */
+    margin: 0;
+    color: white; /* sikrer ikonfarge */
   }
-
-  .button-container button svg {
-    fill: white;
-    flex-shrink: 0;
+  #instagramBtn:hover {
+    background-color: #b92e58;
   }
-
-  /* Responsive */
+  /* Video container med lys bakgrunn og rundede hjørner */
+  #instagram-video-container {
+    max-width: 960px;
+    margin: 30px auto 0 auto;
+    padding: 18px 16px;
+    background-color: #fafafa;
+    border: 1.5px solid #ddd;
+    border-radius: 14px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .instagram-video-block {
+    width: 300px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    padding: 12px;
+    box-sizing: border-box;
+  }
+  .instagram-video-block h2 {
+    color: #0066cc;
+    margin-bottom: 8px;
+    font-size: 18px;
+  }
+  .instagram-video-block blockquote {
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+  @media (max-width: 960px) {
+    #instagram-video-container {
+      max-width: 100%;
+      padding: 14px 10px;
+    }
+    .instagram-video-block {
+      width: 45vw;
+      min-width: 260px;
+    }
+  }
   @media (max-width: 600px) {
-    .button-container {
+    #buttons {
+      justify-content: center;
+      gap: 8px;
+    }
+    button {
+      font-size: 15px;
+      padding: 10px 14px;
+    }
+    #instagram-video-container {
       flex-direction: column;
       align-items: center;
+      gap: 18px;
+    }
+    .instagram-video-block {
+      width: 90vw;
+      max-width: 360px;
     }
   }
 </style>
 </head>
 <body>
+  <h1>Top Rope Solo - Tromsø</h1>
 
-<!-- Buttons -->
-<div class="button-container">
-  <button id="trolltunga-btn" aria-label="Go to Trolltunga">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/></svg>
-    Trolltunga
-  </button>
-  <button id="kjeragbolten-btn" aria-label="Go to Kjeragbolten">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/></svg>
-    Kjeragbolten
-  </button>
-  <button id="preikestolen-btn" aria-label="Go to Preikestolen">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/></svg>
-    Preikestolen
-  </button>
-  <button id="reset-view" aria-label="Show all">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path d="M3 12l18-12v24L3 12z"/></svg>
-    Show all
-  </button>
-</div>
+  <div id="info-text">
+    Explore Top Rope Solo areas in Tromsø.
+  </div>
 
-<!-- Map -->
-<div id="map"></div>
+  <div id="buttons">
+    <button id="overviewBtn" aria-label="Show all locations" style="color:white;">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" height="20" width="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+      </svg>
+      Show all
+    </button>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-  const map = L.map('map').setView([60.0, 7.0], 6);
+    <button data-lat="69.69472" data-lng="18.63642" data-name="Korteidet" aria-label="Show Korteidet location" style="color:#0066cc;">
+      <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false">
+        <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
+      </svg>
+      Korteidet
+    </button>
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
+    <button data-lat="69.78386" data-lng="18.78913" data-name="Lyfjorddalen" aria-label="Show Lyfjorddalen location" style="color:#0066cc;">
+      <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false">
+        <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
+      </svg>
+      Lyfjorddalen
+    </button>
 
-  const mountainIcon = L.divIcon({
-    html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="#0066cc"><path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/></svg>`,
-    className: '',
-    iconSize: [22, 22],
-    iconAnchor: [11, 22],
-    popupAnchor: [0, -22]
-  });
+    <button data-lat="69.65974" data-lng="18.95441" data-name="Valhall" aria-label="Show Valhall location" style="color:#0066cc;">
+      <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false">
+        <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
+      </svg>
+      Valhall
+    </button>
 
-  const locations = [
-    { name: "Trolltunga", coords: [60.1200, 6.7400] },
-    { name: "Kjeragbolten", coords: [59.0416, 6.5761] },
-    { name: "Preikestolen", coords: [58.9863, 6.1903] }
-  ];
+    <button id="instagramBtn" aria-label="Instagram profile Rope Solo Man">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 2A3.75 3.75 0 004 7.75v8.5A3.75 3.75 0 007.75 20h8.5a3.75 3.75 0 003.75-3.75v-8.5A3.75 3.75 0 0016.25 4h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6zm4.5-3.5a1.25 1.25 0 110 2.5 1.25 1.25 0 010-2.5z"/>
+      </svg>
+      Rope Solo Man
+    </button>
+  </div>
 
-  const markers = locations.map(loc =>
-    L.marker(loc.coords, { icon: mountainIcon }).addTo(map).bindPopup(`<b>${loc.name}</b>`)
-  );
+  <div id="map"></div>
 
-  // Button event listeners
-  document.getElementById('trolltunga-btn').addEventListener('click', () => map.setView(locations[0].coords, 13));
-  document.getElementById('kjeragbolten-btn').addEventListener('click', () => map.setView(locations[1].coords, 13));
-  document.getElementById('preikestolen-btn').addEventListener('click', () => map.setView(locations[2].coords, 13));
-  document.getElementById('reset-view').addEventListener('click', () => map.setView([60.0, 7.0], 6));
-</script>
+  <div id="instagram-video-container">
+    <div class="instagram-video-block">
+      <h2>Video from Korteidet</h2>
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DKxCoz_tbzW/" data-instgrm-version="14"></blockquote>
+    </div>
+    <div class="instagram-video-block">
+      <h2>Video from Lyfjorddalen</h2>
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DL8NKszNihY/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==" data-instgrm-version="14"></blockquote>
+    </div>
+    <div class="instagram-video-block">
+      <h2>Video from Valhall</h2>
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DLU4pwkt80j/" data-instgrm-version="14"></blockquote>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script async src="//www.instagram.com/embed.js"></script>
+  <script>
+    const locations = [
+      {
+        name: 'Korteidet',
+        lat: 69.69472,
+        lng: 18.63642,
+        popup: '<strong>Korteidet</strong><br>More info coming.<br><a href="https://klatreforer.tromsoklatring.no/area/3062" target="_blank" rel="noopener noreferrer">Climbingarea - Korteidet</a>'
+      },
+      {
+        name: 'Lyfjorddalen',
+        lat: 69.78386,
+        lng: 18.78913,
+        popup: '<strong>Lyfjorddalen</strong><br>More info coming.<br><a href="https://klatreforer.tromsoklatring.no/area/2868" target="_blank" rel="noopener noreferrer">Climbingarea - Lyfjorddalen</a>'
+      },
+      {
+        name: 'Valhall',
+        lat: 69.65974,
+        lng: 18.95441,
+        popup: '<strong>Valhall</strong><br>More info coming.'
+      }
+    ];
+
+    const map = L.map('map');
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    const mountainIcon = L.divIcon({
+      html: `
+        <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="#0066cc" aria-hidden="true" focusable="false">
+          <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
+        </svg>
+      `,
+      className: '',
+      iconSize: [22, 22],
+      iconAnchor: [11, 22],
+      popupAnchor: [0, -22]
+    });
+
+    const markers = {};
+
+    locations.forEach(({name, lat, lng, popup}) => {
+      const marker = L.marker([lat, lng], {icon: mountainIcon}).addTo(map).bindPopup(popup);
+      markers[name] = marker;
+    });
+
+    const group = new L.featureGroup(Object.values(markers));
+    map.fitBounds(group.getBounds().pad(0.2));
+
+    const buttons = document.querySelectorAll('#buttons button[data-name]');
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const lat = button.getAttribute('data-lat');
+        const lng = button.getAttribute('data-lng');
+        const name = button.getAttribute('data-name');
+
+        map.setView([lat, lng], 15);
+        markers[name].openPopup();
+      });
+    });
+
+    document.getElementById('overviewBtn').addEventListener('click', () => {
+      map.fitBounds(group.getBounds().pad(0.2));
+    });
+
+    document.getElementById('instagramBtn').addEventListener('click', () => {
+      window.open('https://www.instagram.com/rope.solo.man/', '_blank');
+    });
+  </script>
 </body>
 </html>
