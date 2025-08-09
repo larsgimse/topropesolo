@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Klatring i Tromsø</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    header {
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+
+    main {
+      padding: 20px;
+      text-align: center;
+    }
+
+    #map {
+      height: 500px;
+      width: 70vw;
+      max-width: 70%;
+      margin: 0 auto 30px auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .location-buttons {
+      margin-bottom: 20px;
+    }
+
+    .location-buttons button {
+      margin: 5px;
+      padding: 10px 15px;
+      border: none;
+      background-color: #007BFF;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .location-buttons button:hover {
+      background-color: #0056b3;
+    }
+
+    .instagram-videos {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding: 20px;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      background-color: #fff;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .instagram-video-block {
+      width: 300px;
+      overflow: hidden;
+      background-color: white;
+      padding: 12px;
+      box-sizing: border-box;
+      border: none;
+    }
+
+    /* Fjerner kun den innebygde rammen fra Instagram embed */
+    .instagram-video-block blockquote {
+      border: none !important;
+      box-shadow: none !important;
+      background: none !important;
+    }
+
+    .instagram-button {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #E1306C;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    .instagram-button:hover {
+      background-color: #c82361;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Klatring i Tromsø</h1>
+  </header>
+  <main>
+    <div id="map"></div>
+    <div class="location-buttons">
+      <button onclick="flyToLocation(69.6496, 18.9560)">Klatrepark</button>
+      <button onclick="flyToLocation(69.6489, 18.9550)">Buldring</button>
+      <button onclick="flyToLocation(69.6475, 18.9575)">Sportsklatring</button>
+    </div>
+
+    <div class="instagram-videos">
+      <div class="instagram-video-block">
+        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/XXXXXXX/"></blockquote>
+      </div>
+      <div class="instagram-video-block">
+        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/YYYYYYY/"></blockquote>
+      </div>
+      <div class="instagram-video-block">
+        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/ZZZZZZZ/"></blockquote>
+      </div>
+    </div>
+
+    <a href="https://www.instagram.com/dinprofil" target="_blank" class="instagram-button">
+      Følg oss på Instagram
+    </a>
+  </main>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script async src="//www.instagram.com/embed.js"></script>
+  <script>
+    const map = L.map('map').setView([69.6496, 18.9560], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap-bidragsytere'
+    }).addTo(map);
+
+    const locations = [
+      { name: 'Klatrepark', coords: [69.6496, 18.9560] },
+      { name: 'Buldring', coords: [69.6489, 18.9550] },
+      { name: 'Sportsklatring', coords: [69.6475, 18.9575] }
+    ];
+
+    locations.forEach(loc => {
+      L.marker(loc.coords).addTo(map).bindPopup(loc.name);
+    });
+
+    function flyToLocation(lat, lng) {
+      map.flyTo([lat, lng], 16);
+    }
+  </script>
+</body>
+</html>
