@@ -202,26 +202,31 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script async src="//www.instagram.com/embed.js"></script>
   <script>
-    const locations = [
-      {
-        name: 'Korteidet',
-        lat: 69.69472,
-        lng: 18.63642,
-        popup: '<strong><a href="korteidet.html" style="color:#0066cc; text-decoration:none;">Korteidet</a></strong><br>More info coming.<br><a href="https://klatreforer.tromsoklatring.no/area/3062" target="_blank" rel="noopener noreferrer">Climbingarea - Korteidet</a>'
-      },
-      {
-        name: 'Lyfjorddalen',
-        lat: 69.78386,
-        lng: 18.78913,
-        popup: '<strong>Lyfjorddalen</strong><br>More info coming.<br><a href="https://klatreforer.tromsoklatring.no/area/2868" target="_blank" rel="noopener noreferrer">Climbingarea - Lyfjorddalen</a>'
-      },
-      {
-        name: 'Valhall',
-        lat: 69.65974,
-        lng: 18.95441,
-        popup: '<strong>Valhall</strong><br>More info coming.'
-      }
-    ];
+const locations = [
+  {
+    name: 'Korteidet',
+    lat: 69.69472,
+    lng: 18.63642,
+    popup: `<strong><a href="korteidet.html" target="_blank" rel="noopener noreferrer">Korteidet</a></strong><br>
+            More info coming.<br>
+            <a href="https://klatreforer.tromsoklatring.no/area/3062" target="_blank" rel="noopener noreferrer">Climbingarea - Korteidet</a>`
+  },
+  {
+    name: 'Lyfjorddalen',
+    lat: 69.78386,
+    lng: 18.78913,
+    popup: `<strong><a href="lyfjorddalen.html" target="_blank" rel="noopener noreferrer">Lyfjorddalen</a></strong><br>
+            More info coming.<br>
+            <a href="https://klatreforer.tromsoklatring.no/area/2868" target="_blank" rel="noopener noreferrer">Climbingarea - Lyfjorddalen</a>`
+  },
+  {
+    name: 'Valhall',
+    lat: 69.65974,
+    lng: 18.95441,
+    popup: `<strong><a href="valhall.html" target="_blank" rel="noopener noreferrer">Valhall</a></strong><br>
+            More info coming.`
+  }
+];
 
     const map = L.map('map');
 
