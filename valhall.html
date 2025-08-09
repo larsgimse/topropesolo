@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Valhall - Top Rope Solo</title>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  crossorigin=""
+/>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+    margin: 0;
+    padding: 20px 10px 40px;
+  }
+  #buttons {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+  button {
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 17px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s;
+  }
+  button:hover {
+    background-color: #004a99;
+  }
+  /* Fjell-ikon stil */
+  .mountain-icon {
+    width: 22px;
+    height: 22px;
+    fill: black;
+  }
+  /* Pil-ikon stil (hvit) */
+  .back-icon {
+    width: 20px;
+    height: 20px;
+    fill: white;
+  }
+
+  #map-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    max-width: 100vw;
+    padding-top: 10px;
+  }
+  #map {
+    width: 20vw;
+    aspect-ratio: 1 / 1; /* kvadratisk */
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+  }
+  #text-content {
+    max-width: 60vw;
+    text-align: left;
+  }
+  #text-content h1 {
+    color: #0066cc;
+    margin-bottom: 12px;
+    font-size: 28px;
+  }
+  #text-content p {
+    font-size: 18px;
+    line-height: 1.5;
+    color: #444;
+  }
+
+  @media (max-width: 800px) {
+    #map-container {
+      flex-direction: column;
+      align-items: center;
+    }
+    #map {
+      width: 80vw;
+      margin-bottom: 20px;
+    }
+    #text-content {
+      max-width: 90vw;
+    }
+  }
+</style>
+</head>
+<body>
+  <div id="buttons">
+    <button id="backBtn" aria-label="Back to overview">
+      <svg class="back-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+      </svg>
+      Back to overview
+    </button>
+
+    <button id="instagramBtn" aria-label="Instagram profile Rope Solo Man">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 2A3.75 3.75 0 004 7.75v8.5A3.75 3.75 0 007.75 20h8.5a3.75 3.75 0 003.75-3.75v-8.5A3.75 3.75 0 0016.25 4h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6zm4.5-3.5a1.25 1.25 0 110 2.5 1.25 1.25 0 010-2.5z"/>
+      </svg>
+      Rope Solo Man
+    </button>
+  </div>
+
+  <div id="map-container">
+    <div id="map"></div>
+    <div id="text-content">
+      <h1>Valhall</h1>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent sodales, lorem in tincidunt vulputate, purus enim dapibus quam, ut convallis libero enim a enim. Nullam dignissim eros nec magna cursus, nec varius quam cursus.</p>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script>
+    // Koordinater og zoom for Valhall fra index4.html
+    const map = L.map('map').setView([69.71417, 18.64167], 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    const mountainIcon = L.divIcon({
+      html: `
+        <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="black" aria-hidden="true" focusable="false">
+          <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
+        </svg>
+      `,
+      className: '',
+      iconSize: [22, 22],
+      iconAnchor: [11, 22],
+      popupAnchor: [0, -22]
+    });
+
+    L.marker([69.71417, 18.64167], { icon: mountainIcon }).addTo(map).bindPopup('<strong>Valhall</strong>');
+
+    // Gå tilbake til index.html ved klikk på back-knapp
+    document.getElementById('backBtn').addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+
+    // Åpne instagram i ny fane
+    document.getElementById('instagramBtn').addEventListener('click', () => {
+      window.open('https://www.instagram.com/rope.solo.man/', '_blank');
+    });
+  </script>
+</body>
+</html>
