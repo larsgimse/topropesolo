@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Korteidet - Top Rope Solo</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
+      color: #333;
+      margin: 0;
+      padding: 20px 10px 40px;
+    }
+    #buttons {
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+    button {
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 20px;
+      cursor: pointer;
+      font-size: 17px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #004a99;
+    }
+    .mountain-icon {
+      width: 22px;
+      height: 22px;
+      fill: black;
+    }
+    .back-icon {
+      width: 20px;
+      height: 20px;
+      fill: white;
+    }
+    #map-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      max-width: 100vw;
+      padding-top: 10px;
+    }
+    #map {
+      width: 20vw;
+      aspect-ratio: 1 / 1;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+    }
+    #text-content {
+      max-width: 70vw;
+      text-align: left;
+    }
+    #text-content h1 {
+      color: #0066cc;
+      margin-bottom: 12px;
+      font-size: 28px;
+    }
+
+    /* Seksjon styling */
+    .section {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      margin-top: 20px;
+    }
+
+    .section-header {
+      min-width: 150px; /* bredde på bildet */
+    }
+
+    /* Bildestørrelse */
+    .section-image {
+      width: 150px;
+      height: 105px;
+      border-radius: 6px;
+      object-fit: cover;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      box-shadow: 1px 1px 6px rgba(0,0,0,0.1);
+      flex-shrink: 0;
+      display: block;
+    }
+
+    /* Tekstdelen får plass til overskrift og avsnitt */
+    .text-content {
+      flex: 1;
+    }
+    .text-content h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      color: #0066cc;
+    }
+    .section-text {
+      font-size: 18px;
+      line-height: 1.5;
+      color: #444;
+      margin: 0;
+    }
+
+    /* For reversert bilde (bilde til høyre) */
+    .section.reverse {
+      flex-direction: row-reverse;
+    }
+
+    /* Popup overlay for større bilde */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .popup-overlay img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="buttons">
+    <button id="backBtn">
+      <svg class="back-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" /></svg>
+      Tilbake til oversikt
+    </button>
+    <button id="instagramBtn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 2A3.75 3.75 0 004 7.75v8.5A3.75 3.75 0 007.75 20h8.5a3.75 3.75 0 003.75-3.75v-8.5A3.75 3.75 0 0016.25 4h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6zm4.5-3.5a1.25 1.25 0 110 2.5 1.25 1.25 0 010-2.5z"/></svg>
+      Rope Solo Man
+    </button>
+  </div>
+
+  <div id="map-container">
+    <div id="map"></div>
+    <div id="text-content">
+      <h1>Korteidet</h1>
+
+      <!-- Avsnitt 1 -->
+      <div class="section">
+        <div class="section-header">
+          <img src="https://larsgimse.github.io/topropesolo/klatring.jpg" alt="Bilde av Avsnitt 1" class="section-image popup-image" data-full="https://larsgimse.github.io/topropesolo/klatring.jpg" />
+        </div>
+        <div class="text-content">
+          <h2>Avsnitt 1</h2>
+          <p class="section-text">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sed facilisis nunc. Nullam laoreet, sapien nec sollicitudin imperdiet, ligula urna tincidunt nunc, nec feugiat leo lorem at nisl. Morbi volutpat risus ac justo dictum, a egestas metus facilisis. Aliquam erat volutpat. Vivamus faucibus, risus sed cursus porttitor, justo velit scelerisque turpis, ut feugiat lacus lacus non massa. Nam accumsan est nec urna luctus, non vestibulum eros hendrerit. Sed commodo tortor sed lectus luctus posuere.
+          </p>
+        </div>
+      </div>
+
+      <!-- Avsnitt 2 - bilde på høyre side -->
+      <div class="section reverse">
+        <div class="section-header">
+          <img src="https://larsgimse.github.io/topropesolo/klatring.jpg" alt="Bilde av Avsnitt 2" class="section-image popup-image" data-full="https://larsgimse.github.io/topropesolo/klatring.jpg" />
+        </div>
+        <div class="text-content">
+          <h2>Avsnitt 2</h2>
+          <p class="section-text">
+            Curabitur nec risus sed erat aliquam tincidunt. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vivamus efficitur quam eu nisl hendrerit posuere. Proin ac leo sed magna egestas vulputate. Etiam at elit nec nunc suscipit cursus. Morbi finibus, nulla at fermentum bibendum, ligula velit pharetra dolor, vel hendrerit nunc erat id justo. Pellentesque tincidunt venenatis enim, sit amet facilisis lacus condimentum at. In vel ligula mi.
+          </p>
+        </div>
+      </div>
+
+      <!-- Avsnitt 3 -->
+      <div class="section">
+        <div class="section-header">
+          <img src="https://larsgimse.github.io/topropesolo/klatring.jpg" alt="Bilde av Avsnitt 3" class="section-image popup-image" data-full="https://larsgimse.github.io/topropesolo/klatring.jpg" />
+        </div>
+        <div class="text-content">
+          <h2>Avsnitt 3</h2>
+          <p class="section-text">
+            Donec nec urna at ipsum consectetur dictum. Sed tincidunt risus vel nisl consectetur, id venenatis risus fermentum. Nullam non sapien eu tortor laoreet venenatis. Aenean egestas turpis eget erat fringilla, vel congue mauris tincidunt. Phasellus ultricies dui vel metus imperdiet, sed dapibus purus egestas. Fusce a velit ut magna dictum gravida sed at ipsum. Ut vel nisi eros. Cras luctus lacus ut libero imperdiet lacinia.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="popup-overlay" id="popupOverlay">
+    <img src="" alt="Popup bilde" id="popupImage" />
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script>
+    const map = L.map('map').setView([69.69472, 18.63642], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    const mountainIcon = L.divIcon({
+      html: `<svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2 2 22h20L12 2z"/></svg>`,
+      className: '',
+      iconSize: [24, 24],
+      iconAnchor: [12, 24]
+    });
+
+    L.marker([69.69472, 18.63642], {icon: mountainIcon}).addTo(map);
+
+    // Popup image logic
+    const popupImages = document.querySelectorAll('.popup-image');
+    const popupOverlay = document.getElementById('popupOverlay');
+    const popupImage = document.getElementById('popupImage');
+
+    popupImages.forEach(container => {
+      container.addEventListener('click', () => {
+        const fullSrc = container.getAttribute('data-full') || container.src;
+        popupImage.src = fullSrc;
+        popupOverlay.style.display = 'flex';
+      });
+    });
+
+    popupOverlay.addEventListener('click', () => {
+      popupOverlay.style.display = 'none';
+      popupImage.src = '';
+    });
+
+    // Back button
+    document.getElementById('backBtn').addEventListener('click', () => {
+      window.history.back();
+    });
+
+    // Instagram button
+    document.getElementById('instagramBtn').addEventListener('click', () => {
+      window.open('https://www.instagram.com/ropesoloman/', '_blank');
+    });
+  </script>
+</body>
+</html>
