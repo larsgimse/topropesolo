@@ -164,6 +164,13 @@
       Ersfjorden
     </button>
 
+    <button data-lat="69.70587" data-lng="18.59339" data-name="Sjurfjellet" aria-label="Show Sjurfjellet location">
+      <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
+      </svg>
+      Sjurfjellet
+    </button>
+
     <button data-lat="69.78386" data-lng="18.78913" data-name="Lyfjorddalen" aria-label="Show Lyfjorddalen location">
       <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
@@ -213,7 +220,7 @@ const locations = [
     lng: 18.63642,
     popup: `<strong><a href="korteidet.html">Korteidet</a></strong><br>
             More info coming.<br>
-            <a href="https://klatreforer.tromsoklatring.no/area/3062"  target="_blank" rel="noopener noreferrer">Climbingarea - Korteidet</a>`
+            <a href="https://klatreforer.tromsoklatring.no/area/3062" target="_blank" rel="noopener noreferrer">Climbingarea - Korteidet</a>`
   },
   {
     name: 'Ersfjorden',
@@ -222,6 +229,14 @@ const locations = [
     popup: `<strong><a href="ersfjorden.html">Ersfjorden</a></strong><br>
             More info coming.<br>
             <a href="https://klatreforer.tromsoklatring.no/area/2834" target="_blank" rel="noopener noreferrer">Climbingarea - Ersfjorden</a>`
+  },
+  {
+    name: 'Sjurfjellet',
+    lat: 69.70587,
+    lng: 18.59339,
+    popup: `<strong><a href="sjurfjellet.html">Sjurfjellet</a></strong><br>
+            More info coming.<br>
+            <a href="https://klatreforer.tromsoklatring.no/area/2848" target="_blank" rel="noopener noreferrer">Climbingarea - Sjurfjellet</a>`
   },
   {
     name: 'Lyfjorddalen',
@@ -240,54 +255,49 @@ const locations = [
   }
 ];
 
-const map = L.map('map');
+const map = L.map('map').setView([69.7, 18.63], 12);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19,
   attribution:
-    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
-
-const mountainIcon = L.divIcon({
-  html: `
-    <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="black" aria-hidden="true" focusable="false">
-      <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
-    </svg>
-  `,
-  className: '',
-  iconSize: [22, 22],
-  iconAnchor: [11, 22],
-  popupAnchor: [0, -22]
-});
 
 const markers = {};
 
-locations.forEach(({name, lat, lng, popup}) => {
-  const marker = L.marker([lat, lng], {icon: mountainIcon}).addTo(map).bindPopup(popup);
-  markers[name] = marker;
+locations.forEach(loc => {
+  const marker = L.marker([loc.lat, loc.lng]).addTo(map);
+  marker.bindPopup(loc.popup);
+  markers[loc.name] = marker;
 });
 
-const group = new L.featureGroup(Object.values(markers));
-map.fitBounds(group.getBounds().pad(0.2));
-
-const buttons = document.querySelectorAll('#buttons button[data-name]');
-buttons.forEach(button => {
-  button.addEventListener('click', () => {
-    const lat = button.getAttribute('data-lat');
-    const lng = button.getAttribute('data-lng');
-    const name = button.getAttribute('data-name');
-
-    map.setView([lat, lng], 15);
+function showLocation(name) {
+  if (name === 'all') {
+    map.fitBounds(
+      L.latLngBounds(
+        locations.map(loc => [loc.lat, loc.lng])
+      )
+    );
+    for (const marker of Object.values(markers)) {
+      marker.openPopup();
+    }
+  } else if (markers[name]) {
+    map.setView(markers[name].getLatLng(), 14);
     markers[name].openPopup();
+  }
+}
+
+document.querySelectorAll('#buttons button[data-name]').forEach(button => {
+  button.addEventListener('click', e => {
+    showLocation(button.getAttribute('data-name'));
   });
 });
 
 document.getElementById('overviewBtn').addEventListener('click', () => {
-  map.fitBounds(group.getBounds().pad(0.2));
+  showLocation('all');
 });
 
 document.getElementById('instagramBtn').addEventListener('click', () => {
-  window.open('https://www.instagram.com/rope.solo.man/', '_blank');
+  window.open('https://www.instagram.com/ropesoloman/', '_blank', 'noopener');
 });
   </script>
 </body>
