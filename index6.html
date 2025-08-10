@@ -1,152 +1,294 @@
 <!DOCTYPE html>
 <html lang="no">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Klatring i Tromsø</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Top Rope Solo - Tromsø</title>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  crossorigin=""
+/>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+    text-align: center;
+    padding: 20px 10px 40px;
+    margin: 0;
+  }
+  h1 {
+    color: #0066cc;
+    margin-bottom: 10px;
+  }
+  #info-text {
+    max-width: 800px;
+    margin: 0 auto 20px auto;
+    font-size: 18px;
+    color: #444;
+  }
+  #buttons {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+  button {
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 17px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s;
+  }
+  button:hover {
+    background-color: #004a99;
+  }
+  #map {
+    height: 500px;
+    width: 70vw;
+    max-width: 70%;
+    margin: 0 auto 30px auto;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .mountain-icon {
+    width: 22px;
+    height: 22px;
+    fill: black;
+  }
+  #instagramBtn {
+    background-color: #e1306c;
+    margin: 0;
+  }
+  #instagramBtn:hover {
+    background-color: #b92e58;
+  }
+  #instagram-video-container {
+    max-width: 960px;
+    margin: 30px auto 0 auto;
+    padding: 18px 16px;
+    background-color: #fafafa;
+    border: 1.5px solid #ddd;
+    border-radius: 14px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .instagram-video-block {
+    width: 300px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    padding: 12px;
+    box-sizing: border-box;
+    border: none;
+  }
+  .instagram-video-block h2 {
+    color: #0066cc;
+    margin-bottom: 8px;
+    font-size: 18px;
+  }
+  .instagram-video-block blockquote {
+    margin: 0;
+    padding: 0;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  @media (max-width: 960px) {
+    #instagram-video-container {
+      max-width: 100%;
+      padding: 14px 10px;
     }
-
-    header {
-      background-color: #333;
-      color: white;
-      padding: 10px;
-      text-align: center;
-    }
-
-    main {
-      padding: 20px;
-      text-align: center;
-    }
-
-    #map {
-      height: 500px;
-      width: 70vw;
-      max-width: 70%;
-      margin: 0 auto 30px auto;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
-
-    .location-buttons {
-      margin-bottom: 20px;
-    }
-
-    .location-buttons button {
-      margin: 5px;
-      padding: 10px 15px;
-      border: none;
-      background-color: #007BFF;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .location-buttons button:hover {
-      background-color: #0056b3;
-    }
-
-    .instagram-videos {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      flex-wrap: wrap;
-      padding: 20px;
-      border: 2px solid #ddd;
-      border-radius: 12px;
-      background-color: #fff;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
     .instagram-video-block {
-      width: 300px;
-      overflow: hidden;
-      background-color: white;
-      padding: 12px;
-      box-sizing: border-box;
-      border: none;
+      width: 45vw;
+      min-width: 260px;
     }
-
-    /* Fjerner kun den innebygde rammen fra Instagram embed */
-    .instagram-video-block blockquote {
-      border: none !important;
-      box-shadow: none !important;
-      background: none !important;
+  }
+  @media (max-width: 600px) {
+    #buttons {
+      justify-content: center;
+      gap: 8px;
     }
-
-    .instagram-button {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #E1306C;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-      font-weight: bold;
+    button {
+      font-size: 15px;
+      padding: 10px 14px;
     }
-
-    .instagram-button:hover {
-      background-color: #c82361;
+    #instagram-video-container {
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
     }
-  </style>
+    .instagram-video-block {
+      width: 90vw;
+      max-width: 360px;
+    }
+  }
+</style>
 </head>
 <body>
-  <header>
-    <h1>Klatring i Tromsø</h1>
-  </header>
-  <main>
-    <div id="map"></div>
-    <div class="location-buttons">
-      <button onclick="flyToLocation(69.6496, 18.9560)">Klatrepark</button>
-      <button onclick="flyToLocation(69.6489, 18.9550)">Buldring</button>
-      <button onclick="flyToLocation(69.6475, 18.9575)">Sportsklatring</button>
+  <h1>Top Rope Solo - Tromsø</h1>
+
+  <div id="info-text">
+    Explore Top Rope Solo areas in Tromsø.
+  </div>
+
+  <div id="buttons">
+    <button id="overviewBtn" aria-label="Show all locations">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="white" height="20" width="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+      </svg>
+      Show all
+    </button>
+
+    <button data-lat="69.69472" data-lng="18.63642" data-name="Korteidet" aria-label="Show Korteidet location">
+      <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
+      </svg>
+      Korteidet
+    </button>
+
+    <button data-lat="69.70587" data-lng="18.59339" data-name="Ersfjorden" aria-label="Show Ersfjorden location">
+      <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
+      </svg>
+      Ersfjorden
+    </button>
+
+    <button data-lat="69.78386" data-lng="18.78913" data-name="Lyfjorddalen" aria-label="Show Lyfjorddalen location">
+      <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
+      </svg>
+      Lyfjorddalen
+    </button>
+
+    <button data-lat="69.65974" data-lng="18.95441" data-name="Valhall" aria-label="Show Valhall location">
+      <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
+      </svg>
+      Valhall
+    </button>
+
+    <button id="instagramBtn" aria-label="Instagram profile Rope Solo Man">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 2A3.75 3.75 0 004 7.75v8.5A3.75 3.75 0 007.75 20h8.5a3.75 3.75 0 003.75-3.75v-8.5A3.75 3.75 0 0016.25 4h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6zm4.5-3.5a1.25 1.25 0 110 2.5 1.25 1.25 0 010-2.5z"/>
+      </svg>
+      Rope Solo Man
+    </button>
+  </div>
+
+  <div id="map"></div>
+
+  <div id="instagram-video-container">
+    <div class="instagram-video-block">
+      <h2>Video from Korteidet</h2>
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DKxCoz_tbzW/" data-instgrm-version="14"></blockquote>
     </div>
-
-    <div class="instagram-videos">
-      <div class="instagram-video-block">
-        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/XXXXXXX/"></blockquote>
-      </div>
-      <div class="instagram-video-block">
-        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/YYYYYYY/"></blockquote>
-      </div>
-      <div class="instagram-video-block">
-        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/ZZZZZZZ/"></blockquote>
-      </div>
+    <div class="instagram-video-block">
+      <h2>Video from Lyfjorddalen</h2>
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DL8NKszNihY/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==" data-instgrm-version="14"></blockquote>
     </div>
+    <div class="instagram-video-block">
+      <h2>Video from Valhall</h2>
+      <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DLU4pwkt80j/" data-instgrm-version="14"></blockquote>
+    </div>
+  </div>
 
-    <a href="https://www.instagram.com/dinprofil" target="_blank" class="instagram-button">
-      Følg oss på Instagram
-    </a>
-  </main>
-
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script async src="//www.instagram.com/embed.js"></script>
   <script>
-    const map = L.map('map').setView([69.6496, 18.9560], 14);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap-bidragsytere'
-    }).addTo(map);
+const locations = [
+  {
+    name: 'Korteidet',
+    lat: 69.69472,
+    lng: 18.63642,
+    popup: `<strong><a href="korteidet.html">Korteidet</a></strong><br>
+            More info coming.<br>
+            <a href="https://klatreforer.tromsoklatring.no/area/3062"  target="_blank" rel="noopener noreferrer">Climbingarea - Korteidet</a>`
+  },
+  {
+    name: 'Ersfjorden',
+    lat: 69.70587,
+    lng: 18.59339,
+    popup: `<strong><a href="ersfjorden.html">Ersfjorden</a></strong><br>
+            More info coming.<br>
+            <a href="https://klatreforer.tromsoklatring.no/area/2834" target="_blank" rel="noopener noreferrer">Climbingarea - Ersfjorden</a>`
+  },
+  {
+    name: 'Lyfjorddalen',
+    lat: 69.78386,
+    lng: 18.78913,
+    popup: `<strong><a href="lyfjorddalen.html">Lyfjorddalen</a></strong><br>
+            More info coming.<br>
+            <a href="https://klatreforer.tromsoklatring.no/area/2868" target="_blank" rel="noopener noreferrer">Climbingarea - Lyfjorddalen</a>`
+  },
+  {
+    name: 'Valhall',
+    lat: 69.65974,
+    lng: 18.95441,
+    popup: `<strong><a href="valhall.html">Valhall</a></strong><br>
+            More info coming.`
+  }
+];
 
-    const locations = [
-      { name: 'Klatrepark', coords: [69.6496, 18.9560] },
-      { name: 'Buldring', coords: [69.6489, 18.9550] },
-      { name: 'Sportsklatring', coords: [69.6475, 18.9575] }
-    ];
+const map = L.map('map');
 
-    locations.forEach(loc => {
-      L.marker(loc.coords).addTo(map).bindPopup(loc.name);
-    });
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution:
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
 
-    function flyToLocation(lat, lng) {
-      map.flyTo([lat, lng], 16);
-    }
+const mountainIcon = L.divIcon({
+  html: `
+    <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="black" aria-hidden="true" focusable="false">
+      <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
+    </svg>
+  `,
+  className: '',
+  iconSize: [22, 22],
+  iconAnchor: [11, 22],
+  popupAnchor: [0, -22]
+});
+
+const markers = {};
+
+locations.forEach(({name, lat, lng, popup}) => {
+  const marker = L.marker([lat, lng], {icon: mountainIcon}).addTo(map).bindPopup(popup);
+  markers[name] = marker;
+});
+
+const group = new L.featureGroup(Object.values(markers));
+map.fitBounds(group.getBounds().pad(0.2));
+
+const buttons = document.querySelectorAll('#buttons button[data-name]');
+buttons.forEach(button => {
+  button.addEventListener('click', () => {
+    const lat = button.getAttribute('data-lat');
+    const lng = button.getAttribute('data-lng');
+    const name = button.getAttribute('data-name');
+
+    map.setView([lat, lng], 15);
+    markers[name].openPopup();
+  });
+});
+
+document.getElementById('overviewBtn').addEventListener('click', () => {
+  map.fitBounds(group.getBounds().pad(0.2));
+});
+
+document.getElementById('instagramBtn').addEventListener('click', () => {
+  window.open('https://www.instagram.com/rope.solo.man/', '_blank');
+});
   </script>
 </body>
 </html>
