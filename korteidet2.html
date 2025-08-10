@@ -282,12 +282,12 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script>
     // Leaflet kart init
-    const map = L.map('map').setView([60.9768, 10.7463], 14);
+    const map = L.map('map').setView([69.69472, 18.63642], 14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
     // Markør for Korteidet (eksempelkoordinater)
-    L.marker([60.9768, 10.7463]).addTo(map).bindPopup('Korteidet');
+    L.marker([69.69472, 18.63642]).addTo(map).bindPopup('Korteidet');
 
     // Tilbake-knapp
     document.getElementById('backBtn').addEventListener('click', () => {
