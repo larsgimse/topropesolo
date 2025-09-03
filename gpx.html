@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vis GPX-spor på kart</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"></script>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <style>
+        /* Grunnleggende stiler for siden */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        /* Kontainer for kart og filopplasting */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        /* Stil for kartet */
+        #map {
+            height: 500px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        /* Stil for filopplastingsknappen */
+        input[type="file"] {
+            padding: 10px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        input[type="file"]:hover {
+            border-color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Last opp og vis GPX-fil</h1>
+        <p>Velg en .gpx-fil fra enheten din for å vise sporet på kartet nedenfor.</p>
+        
+        <input type="file" id="gpx-file" accept=".gpx">
+        
+        <div id="map"></div>
+    </div>
+
+    <script>
+        // Initialiserer kartet og sentrerer det over et generelt område (f.eks. Norge)
+        const map = L.map('map').setView([62.0, 10.0], 5);
+
+        // Legger til kartfliser (bakgrunnskart) fra OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> bidragsytere'
+        }).addTo(map);
+
+        // Henter fil-input elementet fra HTML
+        const gpxInput = document.getElementById('gpx-file');
+
+        // Legger til en lytter som reagerer når en fil blir valgt
+        gpxInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) {
+                return; // Avslutter hvis ingen fil er valgt
+            }
+
+            // Oppretter en FileReader for å lese innholdet i filen
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const gpxData = e.target.result; // Innholdet i GPX-filen
+
+                // Oppretter et nytt GPX-lag med innholdet fra filen
+                // og legger det til på kartet
+                new L.GPX(gpxData, {
+                    async: true,
+                    marker_options: {
+                        startIconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/pin-icon-start.png',
+                        endIconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/pin-icon-end.png',
+                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/pin-shadow.png',
+                    }
+                }).on('loaded', function(e) {
+                    // Zoomer og sentrerer kartet til å passe sporet
+                    map.fitBounds(e.target.getBounds());
+                }).addTo(map);
+            };
+
+            // Leser filen som tekst
+            reader.readAsText(file);
+        });
+    </script>
+
+</body>
+</html>
