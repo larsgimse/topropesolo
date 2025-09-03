@@ -43,6 +43,11 @@
             border-radius: 8px;
             margin-top: 20px;
         }
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
         /* Stil for filopplastingsknappen */
         input[type="file"] {
             padding: 10px;
@@ -53,15 +58,37 @@
         input[type="file"]:hover {
             border-color: #007bff;
         }
+        /* Stil for "Vis spor"-knappen */
+        button {
+            padding: 12px 20px;
+            font-size: 1em;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h1>Last opp og vis GPX-fil</h1>
-        <p>Velg en .gpx-fil fra enheten din for å vise sporet på kartet nedenfor.</p>
+        <p>1. Velg en .gpx-fil. 2. Klikk på "Vis spor" for å se sporet på kartet.</p>
         
-        <input type="file" id="gpx-file" accept=".gpx">
+        <div class="controls">
+            <input type="file" id="gpx-file" accept=".gpx">
+            
+            <button id="show-track-btn" disabled>Vis spor</button>
+        </div>
         
         <div id="map"></div>
     </div>
@@ -76,25 +103,42 @@
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> bidragsytere'
         }).addTo(map);
 
-        // Henter fil-input elementet fra HTML
+        // Henter elementene fra HTML
         const gpxInput = document.getElementById('gpx-file');
+        const showTrackBtn = document.getElementById('show-track-btn');
 
-        // Legger til en lytter som reagerer når en fil blir valgt
+        let selectedFile = null;
+        let gpxLayer = null;
+
+        // Lytter etter at en fil er valgt
         gpxInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) {
-                return; // Avslutter hvis ingen fil er valgt
+            if (e.target.files.length > 0) {
+                selectedFile = e.target.files[0];
+                showTrackBtn.disabled = false; // Aktiverer knappen
+            } else {
+                selectedFile = null;
+                showTrackBtn.disabled = true; // Deaktiverer knappen
+            }
+        });
+
+        // Lytter etter klikk på "Vis spor"-knappen
+        showTrackBtn.addEventListener('click', function() {
+            if (!selectedFile) {
+                alert("Vennligst velg en GPX-fil først.");
+                return;
             }
 
-            // Oppretter en FileReader for å lese innholdet i filen
+            // Fjerner eventuelt gammelt spor fra kartet
+            if (gpxLayer) {
+                map.removeLayer(gpxLayer);
+            }
+
             const reader = new FileReader();
-
             reader.onload = function(e) {
-                const gpxData = e.target.result; // Innholdet i GPX-filen
+                const gpxData = e.target.result;
 
-                // Oppretter et nytt GPX-lag med innholdet fra filen
-                // og legger det til på kartet
-                new L.GPX(gpxData, {
+                // Oppretter et nytt GPX-lag med filinnholdet
+                gpxLayer = new L.GPX(gpxData, {
                     async: true,
                     marker_options: {
                         startIconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/pin-icon-start.png',
@@ -102,13 +146,13 @@
                         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/pin-shadow.png',
                     }
                 }).on('loaded', function(e) {
-                    // Zoomer og sentrerer kartet til å passe sporet
+                    // Zoomer kartet til å passe sporet
                     map.fitBounds(e.target.getBounds());
                 }).addTo(map);
             };
-
-            // Leser filen som tekst
-            reader.readAsText(file);
+            
+            // Leser filen
+            reader.readAsText(selectedFile);
         });
     </script>
 
