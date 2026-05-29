@@ -163,8 +163,8 @@
                 side: 'lyfjorddalen.html',
                 eksternForer: 'https://klatreforer.tromsoklatring.no/area/2868',
                 videoer: [
-                    { url: 'https://www.instagram.com/rope.solo.man/', tittel: 'Lyfjorddalen Video' },
-                    { url: 'https://www.instagram.com/p/DNeGgjkNLs9/', tittel: 'Lyfjorddalen beta' }
+                    // Beholdt lenken fra "Lyfjorddalen beta", men endret navn til "Video 1" etter ditt ønske
+                    { url: 'https://www.instagram.com/p/DNeGgjkNLs9/', tittel: 'Video 1' }
                 ]
             },
             {
@@ -223,7 +223,6 @@
             const marker = L.marker([sted.lat, sted.lng], {icon: lagFjellIkon()}).addTo(markerGroup).bindPopup(popupHtml);
             markers[sted.navn] = marker;
 
-            // HOVER-LOGIKK: Aktiverer nå hele klatrestedet med en gang musa flyttes over knappen!
             const aktiverSted = () => {
                 if (aktivtStedNavn && markers[aktivtStedNavn] && aktivtStedNavn !== sted.navn) {
                     markers[aktivtStedNavn].setIcon(lagFjellIkon());
@@ -272,10 +271,7 @@
                 }
             };
 
-            // Knytter funksjonen til mouseenter i stedet for click
             btn.addEventListener('mouseenter', aktiverSted);
-            
-            // Gjør at man også kan klikke på selve kart-markøren for å få opp samme info
             marker.on('click', (e) => { L.DomEvent.stopPropagation(e); aktiverSted(); });
         });
 
