@@ -94,7 +94,7 @@
 
     <h1>Top Rope Solo - Tromsø</h1>
     <p class="subtitle">Klatrefelt og lokasjoner 🧗‍♂️⛰️</p>
-    <p class="info-text">Klikk på klatrestedene for å se plassering, videoer og spesifikke førersider.</p>
+    <p class="info-text">Hovre over klatrestedene for å se plassering, videoer og spesifikke førersider.</p>
 
     <div id="buttons">
         <button id="resetBtn" class="top-btn" style="background: var(--dark-grey);">
@@ -110,8 +110,7 @@
             <option value="norge">Norgeskart (Kartverket)</option>
             <option value="osm">OpenStreetMap</option>
         </select>
-        <!-- Den nye knappen for å sentrere kartutsnittet originalt -->
-        <button id="centerMapBtn" style="padding:8px 15px; border-radius:8px; background:var(--dark-grey); color:white; border:none; font-weight:600; cursor:pointer;">Sentrer kart originalt 🔄</button>
+        <button id="centerMapBtn" style="padding:8px 15px; border-radius:8px; background:var(--dark-grey); color:white; border:none; font-weight:600; cursor:pointer;">Sentrer kart 🔄</button>
         <button onclick="window.location.href='https://larsgimse.github.io/topptur/sommer.html'" style="padding:8px 15px; border-radius:8px; background:var(--download-blue); color:white; border:none; font-weight:600; cursor:pointer;">Fjellturer ☀️</button>
     </div>
 
@@ -164,7 +163,8 @@
                 side: 'lyfjorddalen.html',
                 eksternForer: 'https://klatreforer.tromsoklatring.no/area/2868',
                 videoer: [
-                    { url: 'https://www.instagram.com/rope.solo.man/', tittel: 'Lyfjorddalen Video' }
+                    { url: 'https://www.instagram.com/rope.solo.man/', tittel: 'Lyfjorddalen Video' },
+                    { url: 'https://www.instagram.com/p/DNeGgjkNLs9/', tittel: 'Lyfjorddalen beta' }
                 ]
             },
             {
@@ -223,17 +223,7 @@
             const marker = L.marker([sted.lat, sted.lng], {icon: lagFjellIkon()}).addTo(markerGroup).bindPopup(popupHtml);
             markers[sted.navn] = marker;
 
-            btn.addEventListener('mouseenter', () => {
-                marker.setIcon(lagFjellIkon('inverted'));
-                map.panTo([sted.lat, sted.lng]);
-            });
-
-            btn.addEventListener('mouseleave', () => {
-                if (aktivtStedNavn !== sted.navn) {
-                    marker.setIcon(lagFjellIkon());
-                }
-            });
-
+            // HOVER-LOGIKK: Aktiverer nå hele klatrestedet med en gang musa flyttes over knappen!
             const aktiverSted = () => {
                 if (aktivtStedNavn && markers[aktivtStedNavn] && aktivtStedNavn !== sted.navn) {
                     markers[aktivtStedNavn].setIcon(lagFjellIkon());
@@ -282,19 +272,22 @@
                 }
             };
 
-            btn.onclick = aktiverSted;
+            // Knytter funksjonen til mouseenter i stedet for click
+            btn.addEventListener('mouseenter', aktiverSted);
+            
+            // Gjør at man også kan klikke på selve kart-markøren for å få opp samme info
             marker.on('click', (e) => { L.DomEvent.stopPropagation(e); aktiverSted(); });
         });
 
-        // Funksjon for å tilpasse kartutsnittet til alle markører originalt
         const tilpassOriginaltUtsnitt = () => {
             map.fitBounds(markerGroup.getBounds().pad(0.2));
         };
 
-        // Knapp for kun å sentrere kartet til start-visning
-        document.getElementById('centerMapBtn').onclick = tilpassOriginaltUtsnitt;
+        document.getElementById('centerMapBtn').onclick = () => {
+            map.closePopup();
+            tilpassOriginaltUtsnitt();
+        };
 
-        // Vis alle steder-knappen (full nullstilling)
         document.getElementById('resetBtn').onclick = () => {
             aktivtStedNavn = null;
             videoContainer.innerHTML = '';
