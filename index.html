@@ -143,7 +143,6 @@
                 side: 'ersfjorden.html',
                 eksternForer: 'https://klatreforer.tromsoklatring.no/area/2834',
                 videoer: [
-                    /* Lagt til Kvitkuken video her */
                     { url: 'https://www.instagram.com/p/DK0NXewtU0W/', tittel: 'Kvitkuken' }
                 ]
             },
@@ -204,7 +203,6 @@
             `;
             document.getElementById('buttons').appendChild(btn);
 
-            /* Oppdatert popup-link tekst til "Klikk for mer info →" */
             const popupHtml = `
                 <b style="font-size:14px;">${sted.navn}</b><br>
                 <span style="font-size:11px; color:#64748b;">Top Rope Solo lokasjon</span><br>
@@ -241,10 +239,11 @@
                     videoContainer.appendChild(a);
                 });
 
+                /* Her er den oppdaterte knappen som nå sier "Klikk for mer info om [Stedets Navn]" */
                 const sideKnapp = document.createElement('a');
                 sideKnapp.href = sted.side;
                 sideKnapp.className = 'guide-link-btn';
-                sideKnapp.innerHTML = `<span>📖</span> Åpne ${sted.navn}.html`;
+                sideKnapp.innerHTML = `<span>📖</span> Klikk for mer info om ${sted.navn}`;
                 videoContainer.appendChild(sideKnapp);
 
                 if (sted.eksternForer) {
@@ -252,7 +251,6 @@
                     eksternKnapp.href = sted.eksternForer;
                     eksternKnapp.target = "_blank";
                     eksternKnapp.className = 'search-link-btn';
-                    /* Oppdatert knappetekst til "Gå til Klatrefører Tromsø" */
                     eksternKnapp.innerHTML = `<span>🧗‍♂️</span> Gå til Klatrefører Tromsø`;
                     videoContainer.appendChild(eksternKnapp);
                 }
