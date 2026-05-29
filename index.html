@@ -69,7 +69,6 @@
         .guide-link-btn { border-color: var(--climb-blue); color: var(--climb-blue); }
         .search-link-btn { border-color: var(--download-blue); color: var(--download-blue); }
 
-        /* Normal markør (Hvit bakgrunn, blå trekant) */
         .custom-marker-pin {
             background: white;
             border: 2px solid var(--climb-blue);
@@ -82,7 +81,6 @@
         }
         .custom-marker-pin svg { fill: var(--climb-blue); transition: all 0.2s ease; }
 
-        /* Invertert markør ved hovring (Blå bakgrunn, hvit trekant) */
         .custom-marker-pin.inverted {
             background: var(--climb-blue);
             border-color: white;
@@ -112,6 +110,8 @@
             <option value="norge">Norgeskart (Kartverket)</option>
             <option value="osm">OpenStreetMap</option>
         </select>
+        <!-- Den nye knappen for å sentrere kartutsnittet originalt -->
+        <button id="centerMapBtn" style="padding:8px 15px; border-radius:8px; background:var(--dark-grey); color:white; border:none; font-weight:600; cursor:pointer;">Sentrer kart originalt 🔄</button>
         <button onclick="window.location.href='https://larsgimse.github.io/topptur/sommer.html'" style="padding:8px 15px; border-radius:8px; background:var(--download-blue); color:white; border:none; font-weight:600; cursor:pointer;">Fjellturer ☀️</button>
     </div>
 
@@ -189,7 +189,6 @@
             }
         ];
 
-        // Generator-funksjon for ikonet (gjør det enkelt å legge til 'inverted' klasse)
         const lagFjellIkon = (extraClass = '') => L.divIcon({
             html: `
                 <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
@@ -224,22 +223,18 @@
             const marker = L.marker([sted.lat, sted.lng], {icon: lagFjellIkon()}).addTo(markerGroup).bindPopup(popupHtml);
             markers[sted.navn] = marker;
 
-            // HOVER-LOGIKK (Inverter farge og sentrer kartet rolig)
             btn.addEventListener('mouseenter', () => {
                 marker.setIcon(lagFjellIkon('inverted'));
-                map.panTo([sted.lat, sted.lng]); // Sentrerer kartet mykt uten å endre zoom
+                map.panTo([sted.lat, sted.lng]);
             });
 
             btn.addEventListener('mouseleave', () => {
-                // Returner til vanlig hvit/blå farge hvis dette stedet ikke er det aktive/klikkede stedet
                 if (aktivtStedNavn !== sted.navn) {
                     marker.setIcon(lagFjellIkon());
                 }
             });
 
-            // KLIKK-LOGIKK (Åpner menyer og zoomer inn)
             const aktiverSted = () => {
-                // Tilbakestill forrige aktive markør til normalt design først
                 if (aktivtStedNavn && markers[aktivtStedNavn] && aktivtStedNavn !== sted.navn) {
                     markers[aktivtStedNavn].setIcon(lagFjellIkon());
                 }
@@ -249,7 +244,6 @@
                 document.querySelectorAll('.top-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
 
-                // Lås fargen til invertert siden den nå er aktiv
                 marker.setIcon(lagFjellIkon('inverted'));
                 map.flyTo([sted.lat, sted.lng], 14);
                 marker.openPopup();
@@ -292,22 +286,27 @@
             marker.on('click', (e) => { L.DomEvent.stopPropagation(e); aktiverSted(); });
         });
 
-        // Vis alle steder / Nullstill-knappen
+        // Funksjon for å tilpasse kartutsnittet til alle markører originalt
+        const tilpassOriginaltUtsnitt = () => {
+            map.fitBounds(markerGroup.getBounds().pad(0.2));
+        };
+
+        // Knapp for kun å sentrere kartet til start-visning
+        document.getElementById('centerMapBtn').onclick = tilpassOriginaltUtsnitt;
+
+        // Vis alle steder-knappen (full nullstilling)
         document.getElementById('resetBtn').onclick = () => {
             aktivtStedNavn = null;
             videoContainer.innerHTML = '';
             document.querySelectorAll('.top-btn').forEach(b => b.classList.remove('active'));
             map.closePopup();
             
-            // Sett alle markører tilbake til normalt utseende
             for (let navn in markers) {
                 markers[navn].setIcon(lagFjellIkon());
             }
-            
-            map.fitBounds(markerGroup.getBounds().pad(0.2));
+            tilpassOriginaltUtsnitt();
         };
 
-        // Når en popup lukkes manuelt, sjekker vi om vi skal fjerne fokus
         map.on('popupclose', () => {
             if (aktivtStedNavn && markers[aktivtStedNavn]) {
                 markers[aktivtStedNavn].setIcon(lagFjellIkon());
@@ -318,7 +317,7 @@
         });
 
         setTimeout(() => {
-            if (!aktivtStedNavn) map.fitBounds(markerGroup.getBounds().pad(0.2));
+            if (!aktivtStedNavn) tilpassOriginaltUtsnitt();
         }, 500);
     </script>
 </body>
