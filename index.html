@@ -122,7 +122,7 @@
 
         document.getElementById('mapSelect').onchange = (e) => {
             if (e.target.value === "osm") { map.addLayer(osmLayer); map.removeLayer(norgeLayer); }
-            else { map.addLayer(norgeLayer); map.removeLayer(norgeLayer); }
+            else { map.addLayer(norgeLayer); map.removeLayer(osmLayer); }
         };
 
         const lokasjoner = [
@@ -143,7 +143,8 @@
                 side: 'ersfjorden.html',
                 eksternForer: 'https://klatreforer.tromsoklatring.no/area/2834',
                 videoer: [
-                    { url: 'https://www.instagram.com/p/C-dPqdWM4Ku/', tittel: 'Ersfjorden TRS' }
+                    /* Lagt til Kvitkuken video her */
+                    { url: 'https://www.instagram.com/p/DK0NXewtU0W/', tittel: 'Kvitkuken' }
                 ]
             },
             {
@@ -163,7 +164,6 @@
                 side: 'valhall.html',
                 eksternForer: null,
                 videoer: [
-                    /* Lagt til din spesifikke Instagram-video her */
                     { url: 'https://www.instagram.com/p/DLU4pwkt80j/', tittel: 'Video 1' }
                 ]
             },
@@ -204,10 +204,11 @@
             `;
             document.getElementById('buttons').appendChild(btn);
 
+            /* Oppdatert popup-link tekst til "Klikk for mer info →" */
             const popupHtml = `
                 <b style="font-size:14px;">${sted.navn}</b><br>
                 <span style="font-size:11px; color:#64748b;">Top Rope Solo lokasjon</span><br>
-                <a href="${sted.side}" style="display:inline-block; margin-top:5px; font-weight:bold; color:var(--climb-blue);">Åpne førerside →</a>
+                <a href="${sted.side}" style="display:inline-block; margin-top:5px; font-weight:bold; color:var(--climb-blue);">Klikk for mer info →</a>
             `;
 
             const marker = L.marker([sted.lat, sted.lng], {icon: mountainIcon}).addTo(markerGroup).bindPopup(popupHtml);
@@ -251,7 +252,8 @@
                     eksternKnapp.href = sted.eksternForer;
                     eksternKnapp.target = "_blank";
                     eksternKnapp.className = 'search-link-btn';
-                    eksternKnapp.innerHTML = `<span>🧗‍♂️</span> Tromsøklatring fører`;
+                    /* Oppdatert knappetekst til "Gå til Klatrefører Tromsø" */
+                    eksternKnapp.innerHTML = `<span>🧗‍♂️</span> Gå til Klatrefører Tromsø`;
                     videoContainer.appendChild(eksternKnapp);
                 }
             };
