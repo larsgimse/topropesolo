@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Top Rope Solo - Tromsø</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --climb-blue: #0066cc;
+            --climb-dark: #004a99;
+            --insta-pink: #e1306c;
+            --dark-grey: #2c3e50;
+            --switch-grey: #cbd5e1;
+            --download-blue: #0ea5e9;
+            --hover-blue: #0076ff;
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            text-align: center; margin: 0; padding: 10px 5px; 
+            background: #f1f5f9; color: var(--dark-grey);
+            overflow-x: hidden; display: flex; flex-direction: column;
+        }
+
+        h1 { margin: 15px 0 5px 0; font-size: 26px; order: 1; }
+        .subtitle { font-size: 15px; font-weight: 600; margin: 0; color: #475569; order: 2; }
+        .info-text { font-size: 13px; font-weight: 400; margin: 4px 0 15px 0; color: #64748b; order: 3; }
+
+        #buttons { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; padding: 5px; order: 4; }
+        #controls-row { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; order: 5; }
+        
+        #map-container { position: relative; max-width: 1100px; margin: 0 auto; width: 100%; order: 7; }
+        #map { height: 65vh; min-height: 450px; width: 100%; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); background: #e5e7eb; }
+
+        #video-buttons-container { 
+            position: absolute; top: 10px; right: 10px; z-index: 1000; 
+            display: flex; flex-direction: column; gap: 8px; align-items: flex-end;
+            width: 240px;
+        }
+
+        .toggle-ui-btn { background: var(--dark-grey); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 4px; opacity: 0.8; }
+        .ui-hidden .video-link-btn, .ui-hidden .search-link-btn, .ui-hidden .guide-link-btn { display: none !important; }
+
+        @media (max-width: 768px) {
+            #buttons { justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; padding: 10px 15px; }
+            #buttons::-webkit-scrollbar { display: none; }
+            #video-buttons-container { width: 220px; }
+            #map { height: 100vw; min-height: unset; width: 100%; }
+        }
+
+        .top-btn { 
+            position: relative; background-color: var(--climb-blue); color: white; border: none; 
+            border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: 13px; font-weight: 600; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); white-space: nowrap; transition: all 0.2s ease-in-out;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .top-btn:hover { transform: scale(1.05); background-color: var(--climb-dark); }
+        .top-btn.active { background-color: var(--hover-blue); transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+
+        .mountain-icon { width: 14px; height: 14px; fill: white; }
+
+        .video-link-btn, .search-link-btn, .guide-link-btn {
+            background: rgba(255, 255, 255, 0.95); padding: 8px 12px; border-radius: 8px; 
+            font-weight: 700; text-decoration: none; font-size: 12px; border: 2.5px solid var(--insta-pink);
+            display: flex; align-items: center; gap: 5px; color: var(--insta-pink); 
+            width: 100%; box-sizing: border-box; backdrop-filter: blur(4px); cursor: pointer;
+        }
+        .guide-link-btn { border-color: var(--climb-blue); color: var(--climb-blue); }
+        .search-link-btn { border-color: var(--download-blue); color: var(--download-blue); }
+
+        .custom-marker-pin {
+            background: white;
+            border: 2px solid var(--climb-blue);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .custom-marker-pin svg { fill: var(--climb-blue); }
+    </style>
+</head>
+<body>
+
+    <h1>Top Rope Solo - Tromsø</h1>
+    <p class="subtitle">Klatrefelt og lokasjoner 🧗‍♂️⛰️</p>
+    <p class="info-text">Klikk på klatrestedene for å se plassering, videoer og spesifikke førersider.</p>
+
+    <div id="buttons">
+        <button id="resetBtn" class="top-btn" style="background: var(--dark-grey);">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="white" height="14" width="14" viewBox="0 0 24 24">
+                <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+            </svg>
+            Vis alle steder
+        </button>
+    </div>
+
+    <div id="controls-row">
+        <select id="mapSelect" style="padding:8px; border-radius:8px; font-weight:600;">
+            <option value="norge">Norgeskart (Kartverket)</option>
+            <option value="osm">OpenStreetMap</option>
+        </select>
+        <button onclick="window.location.href='https://larsgimse.github.io/topptur/sommer.html'" style="padding:8px 15px; border-radius:8px; background:var(--download-blue); color:white; border:none; font-weight:600; cursor:pointer;">Fjellturer ☀️</button>
+    </div>
+
+    <div id="map-container">
+        <div id="map"></div>
+        <div id="video-buttons-container"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        const map = L.map('map').setView([69.69, 18.70], 11);
+        const markerGroup = L.featureGroup().addTo(map);
+        const videoContainer = document.getElementById('video-buttons-container');
+        let aktivtStedNavn = null;
+
+        const norgeLayer = L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topo/default/webmercator/{z}/{y}/{x}.png', { attribution: '&copy; Kartverket' }).addTo(map);
+        const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' });
+
+        document.getElementById('mapSelect').onchange = (e) => {
+            if (e.target.value === "osm") { map.addLayer(osmLayer); map.removeLayer(norgeLayer); }
+            else { map.addLayer(norgeLayer); map.removeLayer(norgeLayer); }
+        };
+
+        const lokasjoner = [
+            {
+                navn: 'Korteidet',
+                lat: 69.69472,
+                lng: 18.63642,
+                side: 'korteidet.html',
+                eksternForer: 'https://klatreforer.tromsoklatring.no/area/3062',
+                videoer: [
+                    { url: 'https://www.instagram.com/rope.solo.man/', tittel: 'Korteidet TRS beta' }
+                ]
+            },
+            {
+                navn: 'Ersfjorden',
+                lat: 69.70587,
+                lng: 18.59339,
+                side: 'ersfjorden.html',
+                eksternForer: 'https://klatreforer.tromsoklatring.no/area/2834',
+                videoer: [
+                    { url: 'https://www.instagram.com/p/C-dPqdWM4Ku/', tittel: 'Ersfjorden TRS' }
+                ]
+            },
+            {
+                navn: 'Lyfjorddalen',
+                lat: 69.78386,
+                lng: 18.78913,
+                side: 'lyfjorddalen.html',
+                eksternForer: 'https://klatreforer.tromsoklatring.no/area/2868',
+                videoer: [
+                    { url: 'https://www.instagram.com/rope.solo.man/', tittel: 'Lyfjorddalen Video' }
+                ]
+            },
+            {
+                navn: 'Valhall',
+                lat: 69.65974,
+                lng: 18.95441,
+                side: 'valhall.html',
+                eksternForer: null,
+                videoer: [
+                    /* Lagt til din spesifikke Instagram-video her */
+                    { url: 'https://www.instagram.com/p/DLU4pwkt80j/', tittel: 'Video 1' }
+                ]
+            },
+            {
+                navn: 'Sjurfjellet',
+                lat: 69.67684,
+                lng: 18.71341,
+                side: 'sjurfjellet.html',
+                eksternForer: 'https://klatreforer.tromsoklatring.no/area/2848',
+                videoer: [
+                    { url: 'https://www.instagram.com/rope.solo.man/', tittel: 'Sjurfjellet Linjer' }
+                ]
+            }
+        ];
+
+        const mountainIcon = L.divIcon({
+            html: `
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                    <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
+                </svg>
+            `,
+            className: 'custom-marker-pin',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15],
+            popupAnchor: [0, -15]
+        });
+
+        const markers = {};
+
+        lokasjoner.sort((a,b) => a.navn.localeCompare(b.navn)).forEach(sted => {
+            const btn = document.createElement('button');
+            btn.className = 'top-btn';
+            btn.innerHTML = `
+                <svg class="mountain-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M12 2L2 20h20L12 2zM12 6.5l5.5 11H6.5L12 6.5z"/>
+                </svg>
+                ${sted.navn}
+            `;
+            document.getElementById('buttons').appendChild(btn);
+
+            const popupHtml = `
+                <b style="font-size:14px;">${sted.navn}</b><br>
+                <span style="font-size:11px; color:#64748b;">Top Rope Solo lokasjon</span><br>
+                <a href="${sted.side}" style="display:inline-block; margin-top:5px; font-weight:bold; color:var(--climb-blue);">Åpne førerside →</a>
+            `;
+
+            const marker = L.marker([sted.lat, sted.lng], {icon: mountainIcon}).addTo(markerGroup).bindPopup(popupHtml);
+            markers[sted.navn] = marker;
+
+            const aktiverSted = () => {
+                aktivtStedNavn = sted.navn;
+                
+                document.querySelectorAll('.top-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                map.flyTo([sted.lat, sted.lng], 14);
+                marker.openPopup();
+
+                videoContainer.innerHTML = '';
+                videoContainer.classList.remove('ui-hidden');
+
+                const toggleBtn = document.createElement('button');
+                toggleBtn.className = 'toggle-ui-btn';
+                toggleBtn.innerText = 'Skjul meny';
+                toggleBtn.onclick = () => toggleBtn.innerText = videoContainer.classList.toggle('ui-hidden') ? 'Vis meny' : 'Skjul meny';
+                videoContainer.appendChild(toggleBtn);
+
+                sted.videoer.forEach(v => {
+                    const a = document.createElement('a');
+                    a.href = v.url;
+                    a.target = "_blank";
+                    a.className = 'video-link-btn';
+                    a.innerHTML = `<span>🎬</span> ${v.tittel}`;
+                    videoContainer.appendChild(a);
+                });
+
+                const sideKnapp = document.createElement('a');
+                sideKnapp.href = sted.side;
+                sideKnapp.className = 'guide-link-btn';
+                sideKnapp.innerHTML = `<span>📖</span> Åpne ${sted.navn}.html`;
+                videoContainer.appendChild(sideKnapp);
+
+                if (sted.eksternForer) {
+                    const eksternKnapp = document.createElement('a');
+                    eksternKnapp.href = sted.eksternForer;
+                    eksternKnapp.target = "_blank";
+                    eksternKnapp.className = 'search-link-btn';
+                    eksternKnapp.innerHTML = `<span>🧗‍♂️</span> Tromsøklatring fører`;
+                    videoContainer.appendChild(eksternKnapp);
+                }
+            };
+
+            btn.onclick = aktiverSted;
+            marker.on('click', (e) => { L.DomEvent.stopPropagation(e); aktiverSted(); });
+        });
+
+        document.getElementById('resetBtn').onclick = () => {
+            aktivtStedNavn = null;
+            videoContainer.innerHTML = '';
+            document.querySelectorAll('.top-btn').forEach(b => b.classList.remove('active'));
+            map.closePopup();
+            map.fitBounds(markerGroup.getBounds().pad(0.2));
+        };
+
+        setTimeout(() => {
+            if (!aktivtStedNavn) map.fitBounds(markerGroup.getBounds().pad(0.2));
+        }, 500);
+    </script>
+</body>
+</html>
