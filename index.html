@@ -271,6 +271,7 @@
         <select id="mapSelect" class="ctl">
             <option value="norge">Norgeskart</option>
             <option value="osm">OpenStreetMap</option>
+            <option value="liberty">Liberty topo</option>
         </select>
 
         <button id="topoBtn" class="ctl" title="Topografi">
@@ -334,7 +335,6 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
     <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"></script>
 
     <script>
     /* Lenketype for video-listen */
@@ -370,6 +370,8 @@
         let aktiveEkstraLag = [];
         let aktivtStedNavn = null;
         let isReseting = false;
+        let aktiveringsTeller = 0;
+        const SPOR_FARGER = ['#2c3e50', '#c2410c'];
 
         let steder = [];
         const knapperMap = {};   // id -> { items, aktiver }
@@ -461,6 +463,9 @@
         map.createPane('linjePane');
         map.getPane('linjePane').style.zIndex = 250;
         map.getPane('linjePane').style.pointerEvents = 'none';
+        map.createPane('libertyPane');
+        map.getPane('libertyPane').style.zIndex = 190;   // under bratthet-laget, så bratthet alltid ligger oppå
+        map.getPane('libertyPane').style.pointerEvents = 'none';
 
         let oversiktGlLayer;
         try {
@@ -489,12 +494,39 @@
         };
 
         // Bytter mellom oversiktskart (ingen sted valgt) og detaljkart (sted valgt)
+        /* Liberty topo (OpenFreeMap). Lages først når det velges. Bytt stil-adressen under om du vil ha en annen Liberty-variant. */
+        const LIBERTY_STIL = 'https://tiles.openfreemap.org/styles/liberty';
+        let libertyLayer = null;
+        function hentLiberty() {
+            if (libertyLayer) return libertyLayer;
+            try {
+                if (typeof L.maplibreGL !== 'function' || typeof maplibregl === 'undefined') throw new Error('MapLibre er ikke lastet');
+                libertyLayer = L.maplibreGL({
+                    style: LIBERTY_STIL, pane: 'libertyPane',
+                    attribution: '<a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> © <a href="https://openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> Data fra <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+                });
+            } catch (err) {
+                console.warn('Liberty feilet, bruker OpenStreetMap i stedet', err);
+                libertyLayer = osmLayer;
+            }
+            return libertyLayer;
+        }
+        function fjernGrunnkart() {
+            [norgeLayer, osmLayer, libertyLayer].forEach(l => { if (l && map.hasLayer(l)) map.removeLayer(l); });
+        }
+        function settGrunnkart() {
+            fjernGrunnkart();
+            const v = mapSelectEl.value;
+            map.addLayer(v === 'osm' ? osmLayer : v === 'liberty' ? hentLiberty() : norgeLayer);
+            if (map.hasLayer(bratthetMap)) bratthetMap.bringToFront();
+        }
+
         let kartModus = null;
         function settKartModus(modus) {
             if (modus === kartModus) return;
             kartModus = modus;
             if (modus === 'oversikt') {
-                map.removeLayer(norgeLayer); map.removeLayer(osmLayer);
+                fjernGrunnkart();
                 map.addLayer(oversiktGlLayer);
                 if (topoAktiv) map.addLayer(topoMap);
                 topoBtn.style.display = '';
@@ -502,7 +534,7 @@
             } else {
                 map.removeLayer(oversiktGlLayer);
                 map.removeLayer(topoMap);
-                if (mapSelectEl.value === 'osm') map.addLayer(osmLayer); else map.addLayer(norgeLayer);
+                settGrunnkart();
                 topoBtn.style.display = 'none';
                 mapSelectEl.style.display = '';
             }
@@ -510,11 +542,9 @@
         }
         settKartModus('oversikt');
 
-        mapSelectEl.onchange = (e) => {
+        mapSelectEl.onchange = () => {
             if (kartModus !== 'topp') return;
-            if (e.target.value === 'osm') { map.addLayer(osmLayer); map.removeLayer(norgeLayer); }
-            else { map.addLayer(norgeLayer); map.removeLayer(osmLayer); }
-            if (map.hasLayer(bratthetMap)) bratthetMap.bringToFront();
+            settGrunnkart();
         };
 
         /* ---------- Hjelpere ---------- */
@@ -532,12 +562,17 @@
             link.download = filnavn.endsWith('.gpx') ? filnavn : filnavn + '.gpx';
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
-        function skapKontrollRad(label, startOn, onSporToggle) {
+        function skapKontrollRad(label, startOn, onSporToggle, farge) {
             const container = document.createElement('div');
             container.className = 'control-row-container';
             const labelEl = document.createElement('div');
             labelEl.className = 'control-label';
             labelEl.innerText = label;
+            if (farge) {
+                const strek = document.createElement('span');
+                strek.style.cssText = 'display:inline-block;width:14px;height:0;border-top:3px dashed ' + farge + ';margin-right:6px;vertical-align:middle';
+                labelEl.insertBefore(strek, labelEl.firstChild);
+            }
             container.appendChild(labelEl);
             const sporGroup = document.createElement('div');
             sporGroup.className = 'toggle-group' + (startOn ? ' active' : '');
@@ -600,9 +635,16 @@
                 document.body.appendChild(sc);
             }
         }
+        /* Målpunkt for veibeskrivelsen: eget punkt i JSON (veibeskrivelse_gps), ellers start på spor 1, ellers selve klatrestedet */
+        function veiMaal(sted) {
+            const o = sted.veibeskrivelse_gps;
+            if (o && typeof o.lat === 'number' && typeof o.lng === 'number') return o;
+            return sted._parkering || sted.gps;
+        }
+        function veiMaalStr(sted) { const g = veiMaal(sted); return g.lat + ',' + g.lng; }
         function ruteUrl(sted, start) {
             return 'https://www.google.com/maps/embed/v1/directions?key=' + encodeURIComponent(GOOGLE_MAPS_API_KEY) +
-                '&origin=' + encodeURIComponent(start) + '&destination=' + sted.gps.lat + ',' + sted.gps.lng +
+                '&origin=' + encodeURIComponent(start) + '&destination=' + veiMaalStr(sted) +
                 '&mode=driving&language=' + (window.__lang && window.__lang() === 'en' ? 'en' : 'no');
         }
         function aapneRute(sted) {
@@ -611,7 +653,7 @@
             const vis = () => {
                 const start = modalStart.value.trim() || 'Tromsø sentrum';
                 try { localStorage.setItem('toprope_start', start); } catch (_) {}
-                modalEkstern.href = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(start) + '&destination=' + sted.gps.lat + ',' + sted.gps.lng + '&travelmode=driving';
+                modalEkstern.href = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(start) + '&destination=' + veiMaalStr(sted) + '&travelmode=driving';
                 const f = modalInnhold.querySelector('iframe');
                 if (f) f.src = ruteUrl(sted, start);
             };
@@ -782,10 +824,46 @@
             aktiveEkstraLag = [];
         }
 
+        /* ---------- GPX-spor ---------- */
+        // Støtter tilkomst.spor = [{gpx, tittel, farge}, ...] (anbefalt), og de gamle feltene tilkomst.gpx / tilkomst.punkter
+        function hentSporListe(t) {
+            if (Array.isArray(t.spor)) return t.spor.filter(sp => sp && (sp.gpx || (Array.isArray(sp.punkter) && sp.punkter.length > 1)));
+            if (t.gpx) return [{ gpx: t.gpx, farge: t.farge }];
+            if (Array.isArray(t.punkter) && t.punkter.length > 1) return [{ punkter: t.punkter, farge: t.farge }];
+            return [];
+        }
+        const gpxCache = {};
+        function parseGpx(tekst) {
+            const xml = new DOMParser().parseFromString(tekst, 'application/xml');
+            if (xml.getElementsByTagName('parsererror').length) throw new Error('Ugyldig GPX');
+            const hent = nodes => Array.from(nodes).map(n => [parseFloat(n.getAttribute('lat')), parseFloat(n.getAttribute('lon'))]).filter(p => isFinite(p[0]) && isFinite(p[1]));
+            const segs = [];
+            Array.from(xml.getElementsByTagName('trkseg')).forEach(seg => { const p = hent(seg.getElementsByTagName('trkpt')); if (p.length > 1) segs.push(p); });
+            if (!segs.length) { const p = hent(xml.getElementsByTagName('rtept')); if (p.length > 1) segs.push(p); }
+            if (!segs.length) throw new Error('Fant ingen punkter i GPX');
+            return segs;
+        }
+        function hentSporSegmenter(sp) {
+            if (!sp.gpx) return Promise.resolve([sp.punkter]);
+            if (!gpxCache[sp.gpx]) {
+                gpxCache[sp.gpx] = fetch('gpx/' + sp.gpx).then(r => { if (!r.ok) throw new Error('Fant ikke gpx/' + sp.gpx); return r.text(); }).then(parseGpx);
+                gpxCache[sp.gpx].catch(() => { delete gpxCache[sp.gpx]; });
+            }
+            return gpxCache[sp.gpx];
+        }
+        function byggSporLag(segs, farge, tittel) {
+            const lag = L.featureGroup(segs.map(seg => L.polyline(seg, { color: farge, weight: 3, opacity: 0.95, dashArray: '4,6' })));
+            const start = L.circleMarker(segs[0][0], { radius: 5, color: farge, weight: 2, fillColor: '#fff', fillOpacity: 1 });
+            start.bindTooltip('Start', { direction: 'top', className: 'sted-tip' });
+            lag.addLayer(start);
+            return lag;
+        }
+
         /* ---------- Aktiver et sted ---------- */
         function lagAktiver(sted) {
             return function aktiver() {
                 isReseting = false; aktivtStedNavn = sted.navn; settKartModus('topp');
+                const token = ++aktiveringsTeller;
                 document.getElementById('topSearchInput').value = sted.navn;
                 avbrytHover(); lukkAlleDropdowns();
                 map.closePopup();
@@ -860,7 +938,8 @@
                 /* Veibeskrivelse (Google Maps) */
                 const mapsBtn = document.createElement('a');
                 mapsBtn.className = 'search-link-btn';
-                mapsBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${sted.gps.lat},${sted.gps.lng}&travelmode=driving`;
+                const settVeiLenke = () => { mapsBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${veiMaalStr(sted)}&travelmode=driving`; };
+                settVeiLenke();
                 mapsBtn.target = '_blank'; mapsBtn.rel = 'noopener';
                 mapsBtn.innerHTML = '<span>🚘</span> Veibeskrivelse';
                 mapsBtn.addEventListener('click', e => { if (GOOGLE_MAPS_API_KEY && vanligKlikk(e)) { e.preventDefault(); aapneRute(sted); } });
@@ -902,34 +981,45 @@
                 };
                 videoContainer.appendChild(gpsBox);
 
-                /* Tilkomst til selve klatrestedet (vises kun når den er lagt inn i JSON) */
+                /* Tilkomst: ett eller flere spor (GPX i mappen gpx/) fra parkering til klatrestedet */
                 const t = sted.tilkomst || {};
-                const harGpx = !!t.gpx;
-                const harPunkter = Array.isArray(t.punkter) && t.punkter.length > 1;
-                if (harGpx || harPunkter) {
-                    const farge = t.farge || '#2c3e50';
-                    let tilkomstLag = null;
-                    const visTilkomst = () => {
-                        if (!tilkomstLag) {
-                            if (harGpx) {
-                                tilkomstLag = new L.GPX('gpx/' + t.gpx, {
-                                    async: true, marker_options: { startIconUrl: null, endIconUrl: null, shadowUrl: null },
-                                    polyline_options: { color: farge, weight: 3, opacity: 0.95, dashArray: '4,6' }
-                                }).on('loaded', e => map.fitBounds(e.target.getBounds().extend([sted.gps.lat, sted.gps.lng]), { padding: [50, 50] }))
-                                  .on('error', () => console.warn('Kunne ikke laste GPX: ' + t.gpx));
-                            } else {
-                                tilkomstLag = L.polyline(t.punkter, { color: farge, weight: 3, opacity: 0.95, dashArray: '4,6' });
-                            }
-                        }
-                        tilkomstLag.addTo(map);
-                        if (!aktiveEkstraLag.includes(tilkomstLag)) aktiveEkstraLag.push(tilkomstLag);
-                        if (!harGpx) map.fitBounds(tilkomstLag.getBounds().extend([sted.gps.lat, sted.gps.lng]), { padding: [50, 50] });
-                    };
-                    videoContainer.appendChild(skapKontrollRad('Tilkomst', true, on => {
-                        if (on) visTilkomst();
-                        else if (tilkomstLag) { map.removeLayer(tilkomstLag); aktiveEkstraLag = aktiveEkstraLag.filter(x => x !== tilkomstLag); }
+                const sporListe = hentSporListe(t);
+                if (sporListe.length) {
+                    const alle = sporListe.map((sp, i) => ({
+                        sp, paa: true, segs: null, lag: null,
+                        farge: sp.farge || SPOR_FARGER[i % SPOR_FARGER.length],
+                        tittel: sp.tittel || ('Spor ' + (i + 1))
                     }));
-                    visTilkomst();
+                    const tilpassKart = () => {
+                        const b = L.latLngBounds([[sted.gps.lat, sted.gps.lng]]);
+                        alle.forEach(e => { if (e.lag && map.hasLayer(e.lag)) b.extend(e.lag.getBounds()); });
+                        map.fitBounds(b, { padding: [50, 50] });
+                    };
+                    const visLag = e => {
+                        if (!e.lag) return;
+                        e.lag.addTo(map);
+                        if (!aktiveEkstraLag.includes(e.lag)) aktiveEkstraLag.push(e.lag);
+                    };
+
+                    alle.forEach((e, i) => {
+                        videoContainer.appendChild(skapKontrollRad(alle.length > 1 ? 'Tilkomst spor ' + (i + 1) : 'Tilkomst', true, on => {
+                            e.paa = on;
+                            if (!e.lag) return;
+                            if (on) visLag(e);
+                            else { map.removeLayer(e.lag); aktiveEkstraLag = aktiveEkstraLag.filter(x => x !== e.lag); }
+                        }, e.farge));
+                    });
+
+                    Promise.all(alle.map(e => hentSporSegmenter(e.sp).then(segs => {
+                        e.segs = segs;
+                        e.lag = byggSporLag(segs, e.farge, e.tittel);
+                    }).catch(err => console.warn('Kunne ikke laste GPX: ' + (e.sp.gpx || ''), err)))).then(() => {
+                        if (token !== aktiveringsTeller) return;     // brukeren har byttet sted i mellomtiden
+                        const foerste = alle.find(e => e.segs && e.segs.length);
+                        if (foerste) { sted._parkering = { lat: foerste.segs[0][0][0], lng: foerste.segs[0][0][1] }; settVeiLenke(); }
+                        alle.forEach(e => { if (e.paa) visLag(e); });
+                        tilpassKart();
+                    });
 
                     if (t.beskrivelse) {
                         const tb = document.createElement('div');
@@ -940,7 +1030,8 @@
                         videoContainer.appendChild(tb);
                     }
 
-                    if (harGpx) {
+                    const medGpx = alle.filter(e => e.sp.gpx);
+                    if (medGpx.length) {
                         const dlArea = document.createElement('div');
                         dlArea.className = 'download-area';
                         const dlHeader = document.createElement('div');
@@ -950,10 +1041,13 @@
                         dlArea.appendChild(dlHeader);
                         const linksCont = document.createElement('div');
                         linksCont.className = 'download-links-container';
-                        const aTil = document.createElement('span');
-                        aTil.className = 'dl-link'; aTil.innerText = 'Tilkomst';
-                        aTil.onclick = () => lastNedGPX('gpx/' + t.gpx, `${sted.navn}_Tilkomst`);
-                        linksCont.appendChild(aTil);
+                        medGpx.forEach(e => {
+                            const a = document.createElement('span');
+                            a.className = 'dl-link';
+                            a.innerText = medGpx.length > 1 ? e.tittel : 'Tilkomst';
+                            a.onclick = () => lastNedGPX('gpx/' + e.sp.gpx, `${sted.navn}_${e.tittel.replace(/\s+/g, '_')}`);
+                            linksCont.appendChild(a);
+                        });
                         dlArea.appendChild(linksCont);
                         videoContainer.appendChild(dlArea);
                     }
@@ -1026,7 +1120,7 @@
 
         /* ---------- Nullstill ---------- */
         document.getElementById('resetBtn').onclick = () => {
-            isReseting = true; aktivtStedNavn = null; videoContainer.innerHTML = ''; settKartModus('oversikt');
+            isReseting = true; aktiveringsTeller++; aktivtStedNavn = null; videoContainer.innerHTML = ''; settKartModus('oversikt');
             searchInput.value = '';
             const cleanUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
             window.history.pushState({ path: cleanUrl }, '', cleanUrl);
@@ -1082,6 +1176,7 @@
         'Klatrefører Tromsø': 'Climbing guide Tromsø',
         'Brattskala': 'Steepness scale',
         'Tilkomst': 'Approach',
+        'Start': 'Start',
         'Last ned GPX': 'Download GPX',
         'Kommer mer info snart...': 'More info coming soon...',
         'Kvitkuken': 'Kvitkuken',
@@ -1092,7 +1187,9 @@
 
     var REGLER = [
         [/^Veibeskrivelse til (.+)$/g, 'Driving directions to $1'],
-        [/^(\d+) steder lastet$/g, '$1 areas loaded']
+        [/^(\d+) steder lastet$/g, '$1 areas loaded'],
+        [/^Tilkomst spor (\d+)$/g, 'Approach track $1'],
+        [/^Spor (\d+)$/g, 'Track $1']
     ];
 
     function oversett(tekst) {

@@ -8,13 +8,12 @@
       "veibeskrivelse": "Fritekst om hvordan man kommer seg dit (parkering, ca. avstand osv.). null = ikke skrevet enda. Kan inneholde enkel HTML som <br> og <b>.",
       "klatreforer": "Lenke til Klatrefører Tromsø for stedet, eller null.",
       "videoer": "Liste med {url, tittel, type, plakat}. Hver video vises som lik rute i panelet (3 i bredden, uansett antall) og åpner Instagram i ny fane. Instagram-forhåndsvisningen hentes automatisk som bakgrunn. «plakat»: valgfri sti til eget bilde (f.eks. «thumbs/korteidet_1.jpg») som da brukes i stedet. Valgfritt «dato»: «2025» el.l. for årstallmerke. type: video | photo | strava | suunto.",
-      "tilkomst": "Veien fra parkering til selve klatrestedet. Fylles ut senere, se under.",
-      "tilkomst.gpx": "Filnavn på en GPX-fil som ligger i mappen gpx/ (f.eks. «korteidet_tilkomst.gpx»). null = ikke klar.",
-      "tilkomst.punkter": "Alternativ til GPX: liste med [lat, lng]-par som tegnes som linje. [] = ikke klar.",
+      "tilkomst": "Veien fra parkering til klatrestedet. Inneholder «spor» (inntil to, gjerne flere) og valgfri «beskrivelse».",
       "tilkomst.beskrivelse": "Kort tekst om tilkomsten (valgfri).",
-      "tilkomst.farge": "Linjefarge (valgfri, standard er mørk grå)."
+      "veibeskrivelse_gps": "Valgfritt eget punkt {lat, lng} som «Veibeskrivelse» (Google Maps) skal navigere til. null = bruker startpunktet på spor 1 (fra GPX), og hvis det ikke finnes, selve klatrestedet.",
+      "tilkomst.spor": "Liste med {gpx, tittel, farge}. «gpx» er filnavn i mappen gpx/ (f.eks. «ersfjorden1.gpx»). «tittel» vises i menyen (standard «Spor 1», «Spor 2»). «farge» er valgfri linjefarge (standard mørk grå for spor 1 og oransje for spor 2). Hvert spor får egen av/på-bryter og GPX-nedlasting. Startpunktet på spor 1 brukes som mål for «Veibeskrivelse»."
     },
-    "slik_legger_du_til_tilkomst": "Sett enten tilkomst.gpx til filnavnet eller fyll tilkomst.punkter. Da dukker en «Tilkomst»-bryter (og GPX-nedlasting) opp automatisk i menyen for det stedet. Ingenting annet må endres."
+    "slik_legger_du_til_tilkomst": "Legg GPX-filen i mappen gpx/ og skriv filnavnet i tilkomst.spor. Da dukker en «Tilkomst»-bryter (og GPX-nedlasting) opp automatisk i menyen for det stedet. Ingenting annet må endres."
   },
   "steder": [
     {
@@ -24,6 +23,7 @@
         "lat": 69.70587,
         "lng": 18.59339
       },
+      "veibeskrivelse_gps": null,
       "veibeskrivelse": null,
       "klatreforer": "https://klatreforer.tromsoklatring.no/area/2834",
       "videoer": [
@@ -35,10 +35,19 @@
         }
       ],
       "tilkomst": {
-        "gpx": null,
-        "punkter": [],
         "beskrivelse": null,
-        "farge": null
+        "spor": [
+          {
+            "gpx": "ersfjorden1.gpx",
+            "tittel": "Spor 1",
+            "farge": null
+          },
+          {
+            "gpx": "ersfjorden2.gpx",
+            "tittel": "Spor 2",
+            "farge": null
+          }
+        ]
       }
     },
     {
@@ -48,6 +57,7 @@
         "lat": 69.69472,
         "lng": 18.63642
       },
+      "veibeskrivelse_gps": null,
       "veibeskrivelse": null,
       "klatreforer": "https://klatreforer.tromsoklatring.no/area/3062",
       "videoer": [
@@ -89,10 +99,14 @@
         }
       ],
       "tilkomst": {
-        "gpx": null,
-        "punkter": [],
         "beskrivelse": null,
-        "farge": null
+        "spor": [
+          {
+            "gpx": "korteidet.gpx",
+            "tittel": "Spor 1",
+            "farge": null
+          }
+        ]
       }
     },
     {
@@ -102,6 +116,7 @@
         "lat": 69.78386,
         "lng": 18.78913
       },
+      "veibeskrivelse_gps": null,
       "veibeskrivelse": null,
       "klatreforer": "https://klatreforer.tromsoklatring.no/area/2868",
       "videoer": [
@@ -131,10 +146,14 @@
         }
       ],
       "tilkomst": {
-        "gpx": null,
-        "punkter": [],
         "beskrivelse": null,
-        "farge": null
+        "spor": [
+          {
+            "gpx": "lyfjorddalen.gpx",
+            "tittel": "Spor 1",
+            "farge": null
+          }
+        ]
       }
     },
     {
@@ -144,6 +163,7 @@
         "lat": 69.67684,
         "lng": 18.71341
       },
+      "veibeskrivelse_gps": null,
       "veibeskrivelse": null,
       "klatreforer": "https://klatreforer.tromsoklatring.no/area/2848",
       "videoer": [
@@ -155,10 +175,14 @@
         }
       ],
       "tilkomst": {
-        "gpx": null,
-        "punkter": [],
         "beskrivelse": null,
-        "farge": null
+        "spor": [
+          {
+            "gpx": "sjurfjellet.gpx",
+            "tittel": "Spor 1",
+            "farge": null
+          }
+        ]
       }
     },
     {
@@ -168,6 +192,7 @@
         "lat": 69.65974,
         "lng": 18.95441
       },
+      "veibeskrivelse_gps": null,
       "veibeskrivelse": null,
       "klatreforer": null,
       "videoer": [
@@ -185,10 +210,8 @@
         }
       ],
       "tilkomst": {
-        "gpx": null,
-        "punkter": [],
         "beskrivelse": null,
-        "farge": null
+        "spor": []
       }
     }
   ]

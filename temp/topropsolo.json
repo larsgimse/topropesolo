@@ -1,0 +1,195 @@
+{
+  "_info": {
+    "om": "Klatresteder for Top Rope Solo - Tromsø. Siden (index.html) leser denne filen. Hvert sted ligger i listen «steder».",
+    "felter": {
+      "id": "Kort navn uten mellomrom/æøå. Brukes i delelenken (?sted=id).",
+      "navn": "Navnet som vises på siden.",
+      "gps": "Punktet for selve klatrestedet {lat, lng}. Brukes til markør og «Veibeskrivelse» (Google Maps).",
+      "veibeskrivelse": "Fritekst om hvordan man kommer seg dit (parkering, ca. avstand osv.). null = ikke skrevet enda. Kan inneholde enkel HTML som <br> og <b>.",
+      "klatreforer": "Lenke til Klatrefører Tromsø for stedet, eller null.",
+      "videoer": "Liste med {url, tittel, type, plakat}. Hver video vises som lik rute i panelet (3 i bredden, uansett antall) og åpner Instagram i ny fane. Instagram-forhåndsvisningen hentes automatisk som bakgrunn. «plakat»: valgfri sti til eget bilde (f.eks. «thumbs/korteidet_1.jpg») som da brukes i stedet. Valgfritt «dato»: «2025» el.l. for årstallmerke. type: video | photo | strava | suunto.",
+      "tilkomst": "Veien fra parkering til selve klatrestedet. Fylles ut senere, se under.",
+      "tilkomst.gpx": "Filnavn på en GPX-fil som ligger i mappen gpx/ (f.eks. «korteidet_tilkomst.gpx»). null = ikke klar.",
+      "tilkomst.punkter": "Alternativ til GPX: liste med [lat, lng]-par som tegnes som linje. [] = ikke klar.",
+      "tilkomst.beskrivelse": "Kort tekst om tilkomsten (valgfri).",
+      "tilkomst.farge": "Linjefarge (valgfri, standard er mørk grå)."
+    },
+    "slik_legger_du_til_tilkomst": "Sett enten tilkomst.gpx til filnavnet eller fyll tilkomst.punkter. Da dukker en «Tilkomst»-bryter (og GPX-nedlasting) opp automatisk i menyen for det stedet. Ingenting annet må endres."
+  },
+  "steder": [
+    {
+      "id": "ersfjorden",
+      "navn": "Ersfjorden",
+      "gps": {
+        "lat": 69.70587,
+        "lng": 18.59339
+      },
+      "veibeskrivelse": null,
+      "klatreforer": "https://klatreforer.tromsoklatring.no/area/2834",
+      "videoer": [
+        {
+          "url": "https://www.instagram.com/p/DK0NXewtU0W/",
+          "tittel": "Kvitkuken",
+          "type": "video",
+          "plakat": null
+        }
+      ],
+      "tilkomst": {
+        "gpx": null,
+        "punkter": [],
+        "beskrivelse": null,
+        "farge": null
+      }
+    },
+    {
+      "id": "korteidet",
+      "navn": "Korteidet",
+      "gps": {
+        "lat": 69.69472,
+        "lng": 18.63642
+      },
+      "veibeskrivelse": null,
+      "klatreforer": "https://klatreforer.tromsoklatring.no/area/3062",
+      "videoer": [
+        {
+          "url": "https://www.instagram.com/p/DZGFMAjEtEq/",
+          "tittel": "Video 1",
+          "type": "video",
+          "plakat": null
+        },
+        {
+          "url": "https://www.instagram.com/p/DY-qhQWNxXQ/",
+          "tittel": "Video 2",
+          "type": "video",
+          "plakat": null
+        },
+        {
+          "url": "https://www.instagram.com/p/DKxCoz_tbzW/",
+          "tittel": "Video 3",
+          "type": "video",
+          "plakat": null
+        },
+        {
+          "url": "https://www.instagram.com/p/DKpyu3LtHoQ/",
+          "tittel": "Video 4",
+          "type": "video",
+          "plakat": null
+        },
+        {
+          "url": "https://www.instagram.com/p/DKiKXB1tEkD/",
+          "tittel": "Video 5",
+          "type": "video",
+          "plakat": null
+        },
+        {
+          "url": "https://www.instagram.com/p/DFbVR44I3qm/",
+          "tittel": "Video 6",
+          "type": "video",
+          "plakat": null
+        }
+      ],
+      "tilkomst": {
+        "gpx": null,
+        "punkter": [],
+        "beskrivelse": null,
+        "farge": null
+      }
+    },
+    {
+      "id": "lyfjorddalen",
+      "navn": "Lyfjorddalen",
+      "gps": {
+        "lat": 69.78386,
+        "lng": 18.78913
+      },
+      "veibeskrivelse": null,
+      "klatreforer": "https://klatreforer.tromsoklatring.no/area/2868",
+      "videoer": [
+        {
+          "url": "https://www.instagram.com/p/DNeGgjkNLs9/",
+          "tittel": "Video 1",
+          "type": "video",
+          "plakat": null
+        },
+        {
+          "url": "https://www.instagram.com/p/DL8NKszNihY/",
+          "tittel": "Video 2",
+          "type": "video",
+          "plakat": null
+        },
+        {
+          "url": "https://www.instagram.com/p/DLiXG-ctXnp/",
+          "tittel": "Video 3",
+          "type": "video",
+          "plakat": null
+        },
+        {
+          "url": "https://www.instagram.com/p/DLIISNutfrN/",
+          "tittel": "Video 4",
+          "type": "video",
+          "plakat": null
+        }
+      ],
+      "tilkomst": {
+        "gpx": null,
+        "punkter": [],
+        "beskrivelse": null,
+        "farge": null
+      }
+    },
+    {
+      "id": "sjurfjellet",
+      "navn": "Sjurfjellet",
+      "gps": {
+        "lat": 69.67684,
+        "lng": 18.71341
+      },
+      "veibeskrivelse": null,
+      "klatreforer": "https://klatreforer.tromsoklatring.no/area/2848",
+      "videoer": [
+        {
+          "url": "https://www.instagram.com/p/DF_GzWRNQ4_/",
+          "tittel": "Video 1",
+          "type": "video",
+          "plakat": null
+        }
+      ],
+      "tilkomst": {
+        "gpx": null,
+        "punkter": [],
+        "beskrivelse": null,
+        "farge": null
+      }
+    },
+    {
+      "id": "valhall",
+      "navn": "Valhall",
+      "gps": {
+        "lat": 69.65974,
+        "lng": 18.95441
+      },
+      "veibeskrivelse": null,
+      "klatreforer": null,
+      "videoer": [
+        {
+          "url": "https://www.instagram.com/p/DLU4pwkt80j/",
+          "tittel": "Video 1",
+          "type": "video",
+          "plakat": null
+        },
+        {
+          "url": "https://www.instagram.com/p/DLnfN_htVc0/",
+          "tittel": "Video 2",
+          "type": "video",
+          "plakat": null
+        }
+      ],
+      "tilkomst": {
+        "gpx": null,
+        "punkter": [],
+        "beskrivelse": null,
+        "farge": null
+      }
+    }
+  ]
+}
