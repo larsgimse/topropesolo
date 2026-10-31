@@ -97,6 +97,20 @@
         .video-tile:hover .vt-ikon { stroke: var(--ink); }
         .video-tile .vt-navn { font-size: 11px; font-weight: 500; line-height: 1.2; word-break: break-word; }
         .video-tile .badge-label { top: 3px; right: 3px; }
+        .video-tile.har-bilde, .video-tile.har-bilde:hover { background-color: #fff; background-size: cover; background-position: center; background-repeat: no-repeat; aspect-ratio: 1 / 1; justify-content: flex-end; padding: 0; gap: 0; overflow: hidden; box-shadow: inset 0 0 0 3px rgba(255,255,255,.9), inset 0 0 0 4px #c9d6e0; }
+        .video-tile.har-bilde::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,.18); transition: background .3s ease; }
+        .video-tile.har-bilde:hover::before, .video-tile.har-bilde:focus-visible::before { background: rgba(63,111,147,.28); }
+        .video-tile.har-bilde .vt-ikon { position: absolute; top: calc(50% - 15px); left: calc(50% - 15px); width: 30px; height: 30px; stroke: #fff; stroke-width: 1.6; filter: drop-shadow(0 0 3px rgba(0,0,0,.65)); }
+        .video-tile.har-bilde:hover .vt-ikon { stroke: #fff; }
+        .video-tile.har-bilde .vt-navn { position: relative; width: 100%; box-sizing: border-box; padding: 3px 5px; background: rgba(255,255,255,.93); border-top: 1px solid var(--ink); }
+        .vt-embed { position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; background: #fff; }
+        .vt-embed blockquote { position: absolute; left: 0; top: 0; width: 326px; margin: 0; padding: 0; opacity: 0; pointer-events: none; }
+        .vt-embed iframe { position: absolute; left: 0; top: 0; width: 326px !important; min-width: 326px !important; max-width: none !important; margin: 0 !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; transform-origin: 0 0; transform: scale(var(--s, .3)) translateY(-56px); pointer-events: none; }
+        .video-tile.har-embed::before { z-index: 1; background: rgba(0,0,0,.08); }
+        .video-tile.har-embed:hover::before, .video-tile.har-embed:focus-visible::before { background: rgba(63,111,147,.25); }
+        .video-tile.har-embed .vt-ikon { display: none; }
+        .video-tile.har-embed .vt-navn { z-index: 2; }
+        .video-grid.n1 .video-tile.har-bilde { flex-direction: column; aspect-ratio: 16 / 9; padding: 0; min-height: 0; }
         .video-grid.n1 .video-tile { flex-direction: row; justify-content: flex-start; gap: 10px; min-height: 48px; padding: 8px 14px; }
         .video-grid.n1 .vt-ikon { width: 26px; height: 26px; }
         .suunto-icon { color: #ff3b30; font-size: 10px; }
@@ -695,6 +709,28 @@
                 () => { modalStart.focus(); }, { timeout: 8000 });
         };
 
+        /* Instagram-forhåndsvisningen (som i popupen) som bakgrunn i selve ruten.
+           Vises bare når Instagram faktisk svarer; ellers beholdes ruten som vanlig. */
+        function lagEmbedForhandsvisning(tile, permalink) {
+            const boks = document.createElement('div');
+            boks.className = 'vt-embed';
+            const bq = document.createElement('blockquote');
+            bq.className = 'instagram-media';
+            bq.setAttribute('data-instgrm-permalink', permalink + '?utm_source=ig_embed&utm_campaign=loading');
+            bq.setAttribute('data-instgrm-version', '14');
+            boks.appendChild(bq);
+            tile.insertBefore(boks, tile.firstChild);
+            const juster = () => { if (tile.clientWidth) tile.style.setProperty('--s', (tile.clientWidth / 326).toFixed(4)); };
+            const obs = new MutationObserver(() => {
+                if (!boks.querySelector('iframe')) return;
+                obs.disconnect();
+                tile.classList.add('har-bilde', 'har-embed');
+                juster();
+                if (window.ResizeObserver) new ResizeObserver(juster).observe(tile);
+            });
+            obs.observe(boks, { childList: true, subtree: true });
+        }
+
         const VIDEO_IKON = {
             video: '<svg class="vt-ikon" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13"/><path d="M13 10.5v11l9-5.5z"/></svg>',
             photo: '<svg class="vt-ikon" viewBox="0 0 32 32" aria-hidden="true"><rect x="3.5" y="8" width="25" height="18" rx="1"/><path d="M11 8l1.8-3h6.4L21 8"/><circle cx="16" cy="17" r="5"/></svg>',
@@ -882,9 +918,18 @@
                         a.querySelector('.vt-navn').textContent = v.tittel || 'Video';
                         const vBadge = lagBadge(v.dato || null);
                         if (vBadge) a.appendChild(vBadge);
+                        if (v.plakat) {
+                            const img = new Image();
+                            img.onload = () => { a.style.backgroundImage = 'url("' + String(v.plakat).replace(/"/g, '%22') + '")'; a.classList.add('har-bilde'); };
+                            img.src = v.plakat;
+                        } else {
+                            const perm = instagramPermalink(v.url);
+                            if (perm) lagEmbedForhandsvisning(a, perm);
+                        }
                         grid.appendChild(a);
                     });
                     videoContainer.appendChild(grid);
+                    if (grid.querySelector('.vt-embed')) behandleInstaEmbed();
                 }
 
                 /* Klatrefører Tromsø */
