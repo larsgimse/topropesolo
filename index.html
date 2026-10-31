@@ -65,6 +65,7 @@
         #video-buttons-container > .control-row-container { order: 1; }
         #video-buttons-container > .desc-box { order: 3; }
         #video-buttons-container > .gps-box { order: 3; }
+        #video-buttons-container > .video-grid { order: 2; }
         #video-buttons-container > .video-link-btn,
         #video-buttons-container > .search-link-btn { order: 4; }
         #video-buttons-container > .download-area { order: 6; }
@@ -76,7 +77,7 @@
         .share-ui-btn:hover { background: var(--winter-bg); }
 
         .ui-hidden .video-link-btn, .ui-hidden .control-row-container, .ui-hidden .search-link-btn,
-        .ui-hidden .download-area, .ui-hidden .desc-box, .ui-hidden .gps-box { display: none !important; }
+        .ui-hidden .download-area, .ui-hidden .desc-box, .ui-hidden .gps-box, .ui-hidden .video-grid { display: none !important; }
 
         .video-link-btn, .search-link-btn {
             background: rgba(255,255,255,.95); padding: 5px 8px; border-radius: 0;
@@ -87,7 +88,17 @@
             font-family: inherit; text-align: left; transition: background .3s ease;
         }
         .video-link-btn:hover, .search-link-btn:hover { background: var(--winter-bg); }
-        .strava-link-btn, .suunto-link-btn { }
+        .video-grid { display: grid; gap: 6px; grid-template-columns: repeat(3, 1fr); }
+        .video-grid.n1 { grid-template-columns: 1fr; }
+        .video-grid.n2, .video-grid.n4 { grid-template-columns: repeat(2, 1fr); }
+        .video-tile { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 78px; padding: 10px 6px 8px; box-sizing: border-box; text-decoration: none; color: var(--ink); background: rgba(255,255,255,.95); backdrop-filter: blur(4px); border: 1px solid var(--ink); border-radius: 0; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 4px #c9d6e0; transition: background .3s ease, box-shadow .3s ease; text-align: center; }
+        .video-tile:hover, .video-tile:focus-visible { background: var(--winter-bg); box-shadow: inset 0 0 0 3px var(--winter-bg), inset 0 0 0 4px var(--winter-ink); outline: none; }
+        .video-tile .vt-ikon { width: 30px; height: 30px; fill: none; stroke: var(--winter-ink); stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; transition: stroke .3s ease; }
+        .video-tile:hover .vt-ikon { stroke: var(--ink); }
+        .video-tile .vt-navn { font-size: 11px; font-weight: 500; line-height: 1.2; word-break: break-word; }
+        .video-tile .badge-label { top: 3px; right: 3px; }
+        .video-grid.n1 .video-tile { flex-direction: row; justify-content: flex-start; gap: 10px; min-height: 48px; padding: 8px 14px; }
+        .video-grid.n1 .vt-ikon { width: 26px; height: 26px; }
         .suunto-icon { color: #ff3b30; font-size: 10px; }
         .video-link-btn .badge-label { position: static; margin-left: auto; flex-shrink: 0; }
 
@@ -164,8 +175,9 @@
 
         /* Markører: kun fjellikonet */
         .klatre-pin { background: none; border: 0; box-shadow: none; display: flex; justify-content: center; align-items: center; }
-        .klatre-pin svg { width: 18px; height: 18px; fill: none; stroke: var(--winter-ink); stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; filter: drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1px #fff); transition: fill .25s ease, stroke .25s ease; }
-        .klatre-pin.inverted svg { fill: var(--winter-ink); stroke: var(--ink); }
+        .klatre-pin svg { width: 22px; height: 22px; fill: none; stroke: #1d4560; stroke-width: 2.6; stroke-linejoin: round; stroke-linecap: round; overflow: visible; transform-origin: 50% 60%; filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 3px #fff) drop-shadow(0 0 5px rgba(255,255,255,.95)); transition: transform .2s ease, fill .25s ease, stroke .25s ease; }
+        .klatre-pin:hover svg, .klatre-pin.inverted svg { transform: scale(1.25); }
+        .klatre-pin.inverted svg { fill: #1d4560; stroke: var(--ink); }
         .leaflet-tooltip.sted-tip { background: #fff; color: var(--ink); border: 1px solid var(--ink); border-radius: 0; box-shadow: none; font-family: "Jost", Arial, sans-serif; font-size: 12px; font-weight: 500; padding: 2px 8px; }
         .leaflet-tooltip.sted-tip.leaflet-tooltip-top:before { border-top-color: var(--ink); }
 
@@ -485,12 +497,18 @@
             container.appendChild(sporGroup);
             return container;
         }
+        const VIDEO_IKON = {
+            video: '<svg class="vt-ikon" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13"/><path d="M13 10.5v11l9-5.5z"/></svg>',
+            photo: '<svg class="vt-ikon" viewBox="0 0 32 32" aria-hidden="true"><rect x="3.5" y="8" width="25" height="18" rx="1"/><path d="M11 8l1.8-3h6.4L21 8"/><circle cx="16" cy="17" r="5"/></svg>',
+            strava: '<svg class="vt-ikon" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13"/><path d="M8 21l5-8 3 4 3-6 5 10"/></svg>',
+            suunto: '<svg class="vt-ikon" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13"/><path d="M16 8l8 14H8z"/></svg>'
+        };
         const fmtKoord = g => g.lat.toFixed(5) + ', ' + g.lng.toFixed(5);
 
         const lagKlatreIkon = (ekstra = '') => L.divIcon({
             html: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 20l7-12 4 7 3-4 6 9z"/></svg>`,
             className: 'klatre-pin ' + ekstra,
-            iconSize: [30, 30], iconAnchor: [15, 15], popupAnchor: [0, -15]
+            iconSize: [34, 34], iconAnchor: [17, 17], popupAnchor: [0, -17]
         });
 
         /* ---------- Hover i bokstavmenyen ---------- */
@@ -651,17 +669,24 @@
                 menuTopRow.appendChild(hideBtn);
                 videoContainer.appendChild(menuTopRow);
 
-                /* Videoer */
-                (sted.videoer || []).forEach(v => {
-                    const lt = lenkeType(v);
-                    const a = document.createElement('a'); a.href = v.url; a.target = '_blank'; a.rel = 'noopener';
-                    a.className = 'video-link-btn' + (lt === 'strava' ? ' strava-link-btn' : lt === 'suunto' ? ' suunto-link-btn' : '');
-                    const ikonHtml = lt === 'strava' ? '<span>🏃</span>' : lt === 'suunto' ? '<span class="suunto-icon">▲</span>' : `<span>${lt === 'photo' ? '📷' : '🎥'}</span>`;
-                    a.innerHTML = `${ikonHtml} ${v.tittel}`;
-                    const vBadge = lagBadge(v.dato || null);
-                    if (vBadge) a.appendChild(vBadge);
-                    videoContainer.appendChild(a);
-                });
+                /* Videoer: 1–6 ruter med ikon */
+                const vlist = sted.videoer || [];
+                if (vlist.length) {
+                    const grid = document.createElement('div');
+                    grid.className = 'video-grid n' + Math.min(vlist.length, 6);
+                    vlist.forEach(v => {
+                        const lt = lenkeType(v);
+                        const a = document.createElement('a');
+                        a.className = 'video-tile'; a.href = v.url; a.target = '_blank'; a.rel = 'noopener';
+                        a.title = v.tittel || '';
+                        a.innerHTML = VIDEO_IKON[lt] + '<span class="vt-navn"></span>';
+                        a.querySelector('.vt-navn').textContent = v.tittel || 'Video';
+                        const vBadge = lagBadge(v.dato || null);
+                        if (vBadge) a.appendChild(vBadge);
+                        grid.appendChild(a);
+                    });
+                    videoContainer.appendChild(grid);
+                }
 
                 /* Klatrefører Tromsø */
                 if (sted.klatreforer) {
@@ -809,7 +834,7 @@
 
                 steder.forEach(sted => {
                     const m = L.marker([sted.gps.lat, sted.gps.lng], { icon: lagKlatreIkon(), keyboard: true, title: sted.navn }).addTo(markerGroup);
-                    m.bindTooltip(sted.navn, { direction: 'top', offset: [0, -16], className: 'sted-tip' });
+                    m.bindTooltip(sted.navn, { direction: 'top', offset: [0, -20], className: 'sted-tip' });
                     markorMap[sted.id] = m;
                     const aktiver = lagAktiver(sted);
                     knapperMap[sted.id].aktiver = aktiver;
