@@ -219,6 +219,10 @@
         .modal-innhold { overflow: auto; -webkit-overflow-scrolling: touch; }
         .modal-innhold iframe { display: block; width: 100%; border: 0; background: #fff; }
         .modal-innhold iframe.insta { height: min(78vh, 760px); }
+        .modal-innhold video { display: block; width: 100%; max-height: 78vh; background: #000; }
+        .modal-innhold blockquote.instagram-media { margin: 0 auto !important; min-width: 0 !important; max-width: 100% !important; width: 100% !important; }
+        .modal-fallback { padding: 22px 16px; text-align: center; font-size: 13px; font-weight: 400; line-height: 1.4; }
+        .modal-fallback a { display: inline-block; margin-top: 10px; }
         .modal-innhold iframe.rute { height: min(68vh, 620px); }
         .modal-merk { margin: 0; padding: 8px 14px 10px; font-size: 11px; line-height: 1.35; color: var(--muted); font-weight: 400; }
 
@@ -551,14 +555,17 @@
             modalBoks.classList.toggle('bred', !!o.bred);
             modalVerktoy.hidden = !o.verktoy;
             modalInnhold.innerHTML = '';
-            const f = document.createElement('iframe');
-            f.className = o.klasse || '';
-            f.setAttribute('allowfullscreen', '');
-            f.setAttribute('allow', 'autoplay; encrypted-media; fullscreen; geolocation');
-            f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
-            f.title = o.tittel || '';
-            f.src = o.src;
-            modalInnhold.appendChild(f);
+            if (o.node) { modalInnhold.appendChild(o.node); }
+            else {
+                const f = document.createElement('iframe');
+                f.className = o.klasse || '';
+                f.setAttribute('allowfullscreen', '');
+                f.setAttribute('allow', 'autoplay; encrypted-media; fullscreen; geolocation');
+                f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+                f.title = o.tittel || '';
+                f.src = o.src;
+                modalInnhold.appendChild(f);
+            }
             if (o.merk) { const p = document.createElement('p'); p.className = 'modal-merk'; p.textContent = o.merk; modalInnhold.appendChild(p); }
             modalEl.hidden = false;
             document.getElementById('modalLukk').focus();
@@ -576,14 +583,49 @@
         // Vanlig klikk åpner popup; Ctrl/Cmd/midtklikk åpner som vanlig lenke i ny fane
         const vanligKlikk = e => !(e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1);
 
-        function instagramEmbed(url) {
+        function instagramPermalink(url) {
             const m = /instagram\.com\/(p|reel|reels|tv)\/([\w-]+)/i.exec(String(url || ''));
-            return m ? 'https://www.instagram.com/' + (m[1].toLowerCase() === 'reels' ? 'reel' : m[1].toLowerCase()) + '/' + m[2] + '/embed/' : null;
+            return m ? 'https://www.instagram.com/' + (m[1].toLowerCase() === 'reels' ? 'reel' : m[1].toLowerCase()) + '/' + m[2] + '/' : null;
+        }
+        function behandleInstaEmbed() {
+            if (window.instgrm && window.instgrm.Embeds) { window.instgrm.Embeds.process(); return; }
+            if (!document.getElementById('insta-embed-js')) {
+                const sc = document.createElement('script');
+                sc.id = 'insta-embed-js'; sc.async = true; sc.src = 'https://www.instagram.com/embed.js';
+                sc.onload = () => { if (window.instgrm && window.instgrm.Embeds) window.instgrm.Embeds.process(); };
+                document.body.appendChild(sc);
+            }
         }
         function aapneVideo(v) {
-            const src = instagramEmbed(v.url);
-            if (!src) return false;
-            aapneModal({ tittel: v.tittel || 'Video', ekstern: v.url, src, klasse: 'insta' });
+            // 1) Egen videofil (felt «fil» i JSON): spilles direkte, fungerer alltid
+            if (v.fil) {
+                const vid = document.createElement('video');
+                vid.controls = true; vid.autoplay = true; vid.playsInline = true; vid.preload = 'metadata';
+                vid.src = v.fil;
+                if (v.plakat) vid.poster = v.plakat;
+                aapneModal({ tittel: v.tittel || 'Video', ekstern: v.url || v.fil, node: vid, bred: false });
+                return true;
+            }
+            // 2) Instagram: offisiell embed.js-metode
+            const lenke = instagramPermalink(v.url);
+            if (!lenke) return false;
+            const bq = document.createElement('blockquote');
+            bq.className = 'instagram-media';
+            bq.setAttribute('data-instgrm-permalink', lenke + '?utm_source=ig_embed&utm_campaign=loading');
+            bq.setAttribute('data-instgrm-version', '14');
+            aapneModal({ tittel: v.tittel || 'Video', ekstern: v.url, node: bq,
+                merk: 'Spilles ikke videoen av? Instagram begrenser innebygde videoer i noen nettlesere. Bruk «Åpne i ny fane» over.' });
+            behandleInstaEmbed();
+            setTimeout(() => {
+                if (modalEl.hidden || modalInnhold.querySelector('iframe')) return;
+                const bq2 = modalInnhold.querySelector('blockquote.instagram-media');
+                if (!bq2) return;
+                const fb = document.createElement('div');
+                fb.className = 'modal-fallback';
+                fb.innerHTML = '<div>Videoen kunne ikke vises her.</div><a class="modal-knapp" target="_blank" rel="noopener">Åpne på Instagram</a>';
+                fb.querySelector('a').href = v.url;
+                bq2.replaceWith(fb);
+            }, 8000);
             return true;
         }
 
@@ -1036,6 +1078,9 @@
         'Startadresse': 'Start address',
         'Vis rute': 'Show route',
         'Min posisjon': 'My location',
+        'Spilles ikke videoen av? Instagram begrenser innebygde videoer i noen nettlesere. Bruk «Åpne i ny fane» over.': 'Video not playing? Instagram restricts embedded videos in some browsers. Use “Open in new tab” above.',
+        'Videoen kunne ikke vises her.': 'The video could not be shown here.',
+        'Åpne på Instagram': 'Open on Instagram',
         'Klatrefører Tromsø': 'Climbing guide Tromsø',
         'Brattskala': 'Steepness scale',
         'Tilkomst': 'Approach',

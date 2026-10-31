@@ -7,7 +7,7 @@
       "gps": "Punktet for selve klatrestedet {lat, lng}. Brukes til markør og «Veibeskrivelse» (Google Maps).",
       "veibeskrivelse": "Fritekst om hvordan man kommer seg dit (parkering, ca. avstand osv.). null = ikke skrevet enda. Kan inneholde enkel HTML som <br> og <b>.",
       "klatreforer": "Lenke til Klatrefører Tromsø for stedet, eller null.",
-      "videoer": "Liste med {url, tittel, type}. Siden viser 1–6 videoer som ruter i panelet (flere enn 6 vises også, men layouten er laget for opptil 6). type: video | photo | strava | suunto. Valgfritt «dato»: «2025» el.l. for årstallmerke.",
+      "videoer": "Liste med {url, tittel, type}. Klikk åpner videoen i en popup. Valgfritt: «fil» = sti til en egen videofil (f.eks. «video/korteidet1.mp4»), som da spilles direkte i popupen (url kan fortsatt peke til Instagram). Valgfritt «plakat»: bilde som vises før avspilling, og «dato»: «2025» el.l. for årstallmerke. type: video | photo | strava | suunto.",
       "tilkomst": "Veien fra parkering til selve klatrestedet. Fylles ut senere, se under.",
       "tilkomst.gpx": "Filnavn på en GPX-fil som ligger i mappen gpx/ (f.eks. «korteidet_tilkomst.gpx»). null = ikke klar.",
       "tilkomst.punkter": "Alternativ til GPX: liste med [lat, lng]-par som tegnes som linje. [] = ikke klar.",
