@@ -201,6 +201,27 @@
         .custom-bmc-btn:hover { background: #fff3b0; opacity: 1; }
         .custom-bmc-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; }
 
+        /* Popup (video / veibeskrivelse) */
+        .modal { position: fixed; inset: 0; z-index: 100000; display: flex; align-items: center; justify-content: center; padding: 14px; box-sizing: border-box; background: rgba(0,0,0,.45); }
+        .modal-boks { background: #fff; border: 1px solid var(--ink); width: min(100%, 480px); max-height: 100%; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,.25); text-align: left; }
+        .modal-boks.bred { width: min(100%, 860px); }
+        .modal-hode { display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 16px; border-bottom: 1px solid var(--ink); }
+        .modal-tittel { flex: 1; font-size: 16px; font-weight: 300; letter-spacing: -.01em; line-height: 1.2; }
+        .modal-lenke { font-size: 12px; font-weight: 500; color: var(--winter-ink); text-decoration: underline; white-space: nowrap; }
+        .modal-lenke:hover { color: var(--ink); }
+        .modal-lukk { border: 0; background: none; padding: 0 4px; font-size: 26px; font-weight: 200; line-height: 1; color: var(--ink); cursor: pointer; transition: color .3s ease; }
+        .modal-lukk:hover { color: var(--winter-ink); }
+        .modal-verktoy { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 12px; border-bottom: 1px solid #e4e4e4; }
+        .modal-verktoy input { flex: 1 1 200px; min-width: 0; padding: 7px 10px; border: 1px solid var(--ink); border-radius: 0; font-size: 14px; font-family: inherit; font-weight: 400; outline: none; }
+        .modal-verktoy input:focus { border-color: var(--winter-ink); box-shadow: 0 0 0 1px var(--winter-ink); }
+        .modal-knapp { padding: 7px 12px; border: 1px solid var(--ink); border-radius: 0; background: #fff; color: var(--ink); font-size: 13px; font-weight: 400; font-family: inherit; cursor: pointer; transition: background .3s ease; }
+        .modal-knapp:hover { background: var(--winter-bg); }
+        .modal-innhold { overflow: auto; -webkit-overflow-scrolling: touch; }
+        .modal-innhold iframe { display: block; width: 100%; border: 0; background: #fff; }
+        .modal-innhold iframe.insta { height: min(78vh, 760px); }
+        .modal-innhold iframe.rute { height: min(68vh, 620px); }
+        .modal-merk { margin: 0; padding: 8px 14px 10px; font-size: 11px; line-height: 1.35; color: var(--muted); font-weight: 400; }
+
         /* Lasteindikator */
         #track-progress { position: absolute; top: 0; left: 0; right: 0; z-index: 1100; pointer-events: none; transition: opacity .5s ease; }
         #track-progress.done { opacity: 0; }
@@ -286,6 +307,22 @@
         </a>
     </div>
 
+    <div id="modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modalTittel">
+        <div class="modal-boks" id="modalBoks">
+            <div class="modal-hode">
+                <span id="modalTittel" class="modal-tittel"></span>
+                <a id="modalEkstern" class="modal-lenke" target="_blank" rel="noopener">Åpne i ny fane</a>
+                <button id="modalLukk" type="button" class="modal-lukk" aria-label="Lukk">×</button>
+            </div>
+            <div id="modalVerktoy" class="modal-verktoy" hidden>
+                <input type="text" id="modalStart" aria-label="Startadresse" placeholder="Startadresse" autocomplete="off" />
+                <button type="button" id="modalVis" class="modal-knapp">Vis rute</button>
+                <button type="button" id="modalPos" class="modal-knapp">Min posisjon</button>
+            </div>
+            <div id="modalInnhold" class="modal-innhold"></div>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
     <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js"></script>
@@ -303,6 +340,10 @@
     </script>
 
     <script>
+        /* Google Maps Embed API-nøkkel (gratis). Limes inn mellom anførselstegnene for å få veibeskrivelse i popup.
+           Uten nøkkel åpnes Google Maps i ny fane. Begrens nøkkelen til nettadressen din i Google Cloud. */
+        const GOOGLE_MAPS_API_KEY = '';
+
         const map = L.map('map', { zoomSnap: 0.5 }).setView([69.69, 18.75], 11);
 
         // Oversiktsvisning: «vis alle» zoomet litt inn. Endre tallet for mer/mindre zoom.
@@ -497,6 +538,82 @@
             container.appendChild(sporGroup);
             return container;
         }
+        /* ---------- Popup ---------- */
+        const modalEl = document.getElementById('modal'), modalBoks = document.getElementById('modalBoks');
+        const modalInnhold = document.getElementById('modalInnhold'), modalVerktoy = document.getElementById('modalVerktoy');
+        const modalEkstern = document.getElementById('modalEkstern'), modalStart = document.getElementById('modalStart');
+        let modalFokusTilbake = null, modalVis = null;
+
+        function aapneModal(o) {
+            modalFokusTilbake = document.activeElement;
+            document.getElementById('modalTittel').textContent = o.tittel || '';
+            modalEkstern.href = o.ekstern || '#';
+            modalBoks.classList.toggle('bred', !!o.bred);
+            modalVerktoy.hidden = !o.verktoy;
+            modalInnhold.innerHTML = '';
+            const f = document.createElement('iframe');
+            f.className = o.klasse || '';
+            f.setAttribute('allowfullscreen', '');
+            f.setAttribute('allow', 'autoplay; encrypted-media; fullscreen; geolocation');
+            f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+            f.title = o.tittel || '';
+            f.src = o.src;
+            modalInnhold.appendChild(f);
+            if (o.merk) { const p = document.createElement('p'); p.className = 'modal-merk'; p.textContent = o.merk; modalInnhold.appendChild(p); }
+            modalEl.hidden = false;
+            document.getElementById('modalLukk').focus();
+        }
+        function lukkModal() {
+            if (modalEl.hidden) return;
+            modalEl.hidden = true;
+            modalInnhold.innerHTML = '';     // stopper videoen
+            modalVis = null;
+            if (modalFokusTilbake && modalFokusTilbake.focus) modalFokusTilbake.focus();
+        }
+        document.getElementById('modalLukk').onclick = lukkModal;
+        modalEl.addEventListener('mousedown', e => { if (e.target === modalEl) lukkModal(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modalEl.hidden) lukkModal(); });
+        // Vanlig klikk åpner popup; Ctrl/Cmd/midtklikk åpner som vanlig lenke i ny fane
+        const vanligKlikk = e => !(e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1);
+
+        function instagramEmbed(url) {
+            const m = /instagram\.com\/(p|reel|reels|tv)\/([\w-]+)/i.exec(String(url || ''));
+            return m ? 'https://www.instagram.com/' + (m[1].toLowerCase() === 'reels' ? 'reel' : m[1].toLowerCase()) + '/' + m[2] + '/embed/' : null;
+        }
+        function aapneVideo(v) {
+            const src = instagramEmbed(v.url);
+            if (!src) return false;
+            aapneModal({ tittel: v.tittel || 'Video', ekstern: v.url, src, klasse: 'insta' });
+            return true;
+        }
+
+        function ruteUrl(sted, start) {
+            return 'https://www.google.com/maps/embed/v1/directions?key=' + encodeURIComponent(GOOGLE_MAPS_API_KEY) +
+                '&origin=' + encodeURIComponent(start) + '&destination=' + sted.gps.lat + ',' + sted.gps.lng +
+                '&mode=driving&language=' + (window.__lang && window.__lang() === 'en' ? 'en' : 'no');
+        }
+        function aapneRute(sted) {
+            const lagre = () => { try { return localStorage.getItem('toprope_start') || ''; } catch (_) { return ''; } };
+            modalStart.value = lagre() || 'Tromsø sentrum';
+            const vis = () => {
+                const start = modalStart.value.trim() || 'Tromsø sentrum';
+                try { localStorage.setItem('toprope_start', start); } catch (_) {}
+                modalEkstern.href = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(start) + '&destination=' + sted.gps.lat + ',' + sted.gps.lng + '&travelmode=driving';
+                const f = modalInnhold.querySelector('iframe');
+                if (f) f.src = ruteUrl(sted, start);
+            };
+            aapneModal({ tittel: 'Veibeskrivelse til ' + sted.navn, ekstern: '#', src: ruteUrl(sted, modalStart.value), klasse: 'rute', bred: true, verktoy: true });
+            modalVis = vis; vis();
+        }
+        document.getElementById('modalVis').onclick = () => { if (modalVis) modalVis(); };
+        modalStart.addEventListener('keydown', e => { if (e.key === 'Enter' && modalVis) modalVis(); });
+        document.getElementById('modalPos').onclick = () => {
+            if (!navigator.geolocation) return;
+            navigator.geolocation.getCurrentPosition(
+                p => { modalStart.value = p.coords.latitude.toFixed(5) + ',' + p.coords.longitude.toFixed(5); if (modalVis) modalVis(); },
+                () => { modalStart.focus(); }, { timeout: 8000 });
+        };
+
         const VIDEO_IKON = {
             video: '<svg class="vt-ikon" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13"/><path d="M13 10.5v11l9-5.5z"/></svg>',
             photo: '<svg class="vt-ikon" viewBox="0 0 32 32" aria-hidden="true"><rect x="3.5" y="8" width="25" height="18" rx="1"/><path d="M11 8l1.8-3h6.4L21 8"/><circle cx="16" cy="17" r="5"/></svg>',
@@ -679,6 +796,7 @@
                         const a = document.createElement('a');
                         a.className = 'video-tile'; a.href = v.url; a.target = '_blank'; a.rel = 'noopener';
                         a.title = v.tittel || '';
+                        a.addEventListener('click', e => { if (vanligKlikk(e) && aapneVideo(v)) e.preventDefault(); });
                         a.innerHTML = VIDEO_IKON[lt] + '<span class="vt-navn"></span>';
                         a.querySelector('.vt-navn').textContent = v.tittel || 'Video';
                         const vBadge = lagBadge(v.dato || null);
@@ -702,6 +820,7 @@
                 mapsBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${sted.gps.lat},${sted.gps.lng}&travelmode=driving`;
                 mapsBtn.target = '_blank'; mapsBtn.rel = 'noopener';
                 mapsBtn.innerHTML = '<span>🚘</span> Veibeskrivelse';
+                mapsBtn.addEventListener('click', e => { if (GOOGLE_MAPS_API_KEY && vanligKlikk(e)) { e.preventDefault(); aapneRute(sted); } });
                 videoContainer.appendChild(mapsBtn);
 
                 /* Brattskala */
@@ -912,6 +1031,11 @@
         'Vis': 'Show',
         'Veibeskrivelse': 'Driving directions',
         'Info om klatrestedet': 'Climbing area info',
+        'Lukk': 'Close',
+        'Åpne i ny fane': 'Open in new tab',
+        'Startadresse': 'Start address',
+        'Vis rute': 'Show route',
+        'Min posisjon': 'My location',
         'Klatrefører Tromsø': 'Climbing guide Tromsø',
         'Brattskala': 'Steepness scale',
         'Tilkomst': 'Approach',
@@ -924,6 +1048,7 @@
     };
 
     var REGLER = [
+        [/^Veibeskrivelse til (.+)$/g, 'Driving directions to $1'],
         [/^(\d+) steder lastet$/g, '$1 areas loaded']
     ];
 
