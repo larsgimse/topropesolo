@@ -162,11 +162,10 @@
         #topSearchInput { width: 170px; padding: 8px 12px 8px 32px; border: 1px solid var(--ink); border-radius: 0; background: #fff; color: var(--ink); font-size: 14px; font-weight: 400; outline: none; transition: border-color .3s ease; font-family: inherit; }
         #topSearchInput:focus { border-color: var(--winter-ink); box-shadow: 0 0 0 1px var(--winter-ink); }
 
-        /* Markører */
-        .klatre-pin { background: #fff; border: 1px solid var(--ink); border-radius: 0; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,.25); transition: background .25s ease, transform .25s ease; }
-        .klatre-pin svg { width: 18px; height: 18px; fill: none; stroke: var(--winter-ink); stroke-width: 1.4; stroke-linejoin: round; stroke-linecap: round; transition: stroke .25s ease; }
-        .klatre-pin.inverted { background: var(--winter-ink); border-color: var(--winter-ink); transform: scale(1.15); }
-        .klatre-pin.inverted svg { stroke: #fff; }
+        /* Markører: kun fjellikonet */
+        .klatre-pin { background: none; border: 0; box-shadow: none; display: flex; justify-content: center; align-items: center; }
+        .klatre-pin svg { width: 18px; height: 18px; fill: none; stroke: var(--winter-ink); stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; filter: drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1px #fff); transition: fill .25s ease, stroke .25s ease; }
+        .klatre-pin.inverted svg { fill: var(--winter-ink); stroke: var(--ink); }
         .leaflet-tooltip.sted-tip { background: #fff; color: var(--ink); border: 1px solid var(--ink); border-radius: 0; box-shadow: none; font-family: "Jost", Arial, sans-serif; font-size: 12px; font-weight: 500; padding: 2px 8px; }
         .leaflet-tooltip.sted-tip.leaflet-tooltip-top:before { border-top-color: var(--ink); }
 
@@ -698,8 +697,8 @@
                 const descBox = document.createElement('div');
                 descBox.className = 'desc-box';
                 const vbTekst = sted.veibeskrivelse ? sted.veibeskrivelse : '<span class="tom">Kommer mer info snart...</span>';
-                descBox.innerHTML = `<div class="desc-box-title"><span>📝</span> Veibeskrivelse til ${sted.navn}<span class="chev">▼</span></div><div class="desc-box-body">${vbTekst}</div>`;
-                if (window.matchMedia('(max-width: 768px)').matches) descBox.classList.add('collapsed');
+                descBox.innerHTML = `<div class="desc-box-title"><span>📝</span> Info om klatrestedet<span class="chev">▼</span></div><div class="desc-box-body">${vbTekst}</div>`;
+                descBox.classList.add('collapsed');
                 descBox.querySelector('.desc-box-title').onclick = () => descBox.classList.toggle('collapsed');
                 videoContainer.appendChild(descBox);
 
@@ -887,6 +886,7 @@
         'Kopier': 'Copy',
         'Vis': 'Show',
         'Veibeskrivelse': 'Driving directions',
+        'Info om klatrestedet': 'Climbing area info',
         'Klatrefører Tromsø': 'Climbing guide Tromsø',
         'Brattskala': 'Steepness scale',
         'Tilkomst': 'Approach',
@@ -899,7 +899,6 @@
     };
 
     var REGLER = [
-        [/^Veibeskrivelse til (.+)$/g, 'Driving directions to $1'],
         [/^(\d+) steder lastet$/g, '$1 areas loaded']
     ];
 
