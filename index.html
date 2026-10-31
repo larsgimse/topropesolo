@@ -221,6 +221,10 @@
         .modal-innhold iframe.insta { height: min(78vh, 760px); }
         .modal-innhold video { display: block; width: 100%; max-height: 78vh; background: #000; }
         .modal-innhold blockquote.instagram-media { margin: 0 auto !important; min-width: 0 !important; max-width: 100% !important; width: 100% !important; }
+        .modal-boks.insta { width: min(100%, 440px); }
+        .modal-boks.insta .modal-innhold { overflow: hidden; }
+        .insta-fit { overflow: hidden; width: 100%; }
+        .insta-fit iframe { display: block; margin: 0 auto !important; transform-origin: 50% 0; }
         .modal-fallback { padding: 22px 16px; text-align: center; font-size: 13px; font-weight: 400; line-height: 1.4; }
         .modal-fallback a { display: inline-block; margin-top: 10px; }
         .modal-innhold iframe.rute { height: min(68vh, 620px); }
@@ -553,6 +557,7 @@
             document.getElementById('modalTittel').textContent = o.tittel || '';
             modalEkstern.href = o.ekstern || '#';
             modalBoks.classList.toggle('bred', !!o.bred);
+            modalBoks.classList.toggle('insta', !!o.insta);
             modalVerktoy.hidden = !o.verktoy;
             modalInnhold.innerHTML = '';
             if (o.node) { modalInnhold.appendChild(o.node); }
@@ -575,6 +580,7 @@
             modalEl.hidden = true;
             modalInnhold.innerHTML = '';     // stopper videoen
             modalVis = null;
+            stoppTilpass();
             if (modalFokusTilbake && modalFokusTilbake.focus) modalFokusTilbake.focus();
         }
         document.getElementById('modalLukk').onclick = lukkModal;
@@ -582,6 +588,34 @@
         document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modalEl.hidden) lukkModal(); });
         // Vanlig klikk åpner popup; Ctrl/Cmd/midtklikk åpner som vanlig lenke i ny fane
         const vanligKlikk = e => !(e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1);
+
+        /* Skalerer Instagram-visningen ned slik at hele den får plass i popupen (ingen rullefelt) */
+        let tilpassObs = null, tilpassLytter = null;
+        function stoppTilpass() {
+            if (tilpassObs) { tilpassObs.disconnect(); tilpassObs = null; }
+            if (tilpassLytter) { window.removeEventListener('resize', tilpassLytter); tilpassLytter = null; }
+        }
+        function startTilpass(wrap) {
+            stoppTilpass();
+            const tilpass = () => {
+                const f = wrap.querySelector('iframe');
+                if (!f || modalEl.hidden) return;
+                const w = f.offsetWidth, h = f.offsetHeight;
+                if (!w || !h) return;
+                const hode = modalEl.querySelector('.modal-hode'), merk = modalInnhold.querySelector('.modal-merk');
+                const chrome = (hode ? hode.offsetHeight : 0) + (merk ? merk.offsetHeight : 0) + 2;
+                const tilgjH = Math.max(160, window.innerHeight - 28 - chrome);
+                const skala = Math.min(1, tilgjH / h, wrap.clientWidth / w);
+                const ny = skala.toFixed(4), hoyde = Math.ceil(h * skala) + 'px';
+                if (f.dataset.skala !== ny) { f.dataset.skala = ny; f.style.transform = skala < 1 ? 'scale(' + ny + ')' : ''; }
+                if (wrap.style.height !== hoyde) wrap.style.height = hoyde;
+            };
+            tilpassObs = new MutationObserver(tilpass);
+            tilpassObs.observe(wrap, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'height', 'width'] });
+            tilpassLytter = tilpass;
+            window.addEventListener('resize', tilpassLytter);
+            tilpass();
+        }
 
         function instagramPermalink(url) {
             const m = /instagram\.com\/(p|reel|reels|tv)\/([\w-]+)/i.exec(String(url || ''));
@@ -613,9 +647,13 @@
             bq.className = 'instagram-media';
             bq.setAttribute('data-instgrm-permalink', lenke + '?utm_source=ig_embed&utm_campaign=loading');
             bq.setAttribute('data-instgrm-version', '14');
-            aapneModal({ tittel: v.tittel || 'Video', ekstern: v.url, node: bq,
+            const wrap = document.createElement('div');
+            wrap.className = 'insta-fit';
+            wrap.appendChild(bq);
+            aapneModal({ tittel: v.tittel || 'Video', ekstern: v.url, node: wrap, insta: true,
                 merk: 'Spilles ikke videoen av? Instagram begrenser innebygde videoer i noen nettlesere. Bruk «Åpne i ny fane» over.' });
             behandleInstaEmbed();
+            startTilpass(wrap);
             setTimeout(() => {
                 if (modalEl.hidden || modalInnhold.querySelector('iframe')) return;
                 const bq2 = modalInnhold.querySelector('blockquote.instagram-media');
@@ -625,6 +663,7 @@
                 fb.innerHTML = '<div>Videoen kunne ikke vises her.</div><a class="modal-knapp" target="_blank" rel="noopener">Åpne på Instagram</a>';
                 fb.querySelector('a').href = v.url;
                 bq2.replaceWith(fb);
+                wrap.style.height = '';
             }, 8000);
             return true;
         }
