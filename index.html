@@ -70,6 +70,8 @@
         #video-buttons-container > .search-link-btn { order: 4; }
         #video-buttons-container > .download-area { order: 6; }
 
+        .spor-rad { order: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 6px; }
+        .spor-rad > .control-row-container { min-width: 0; }
         .menu-top-row { display: flex; gap: 6px; width: 100%; justify-content: flex-end; }
         .toggle-ui-btn { background: var(--ink); color: white; border: none; padding: 6px 12px; border-radius: 0; font-size: 11px; font-weight: 500; cursor: pointer; opacity: .9; }
         .toggle-ui-btn:hover { opacity: 1; }
@@ -77,7 +79,7 @@
         .share-ui-btn:hover { background: var(--winter-bg); }
 
         .ui-hidden .video-link-btn, .ui-hidden .control-row-container, .ui-hidden .search-link-btn,
-        .ui-hidden .download-area, .ui-hidden .desc-box, .ui-hidden .gps-box, .ui-hidden .video-grid { display: none !important; }
+        .ui-hidden .spor-rad, .ui-hidden .download-area, .ui-hidden .desc-box, .ui-hidden .gps-box, .ui-hidden .video-grid { display: none !important; }
 
         .video-link-btn, .search-link-btn {
             background: rgba(255,255,255,.95); padding: 5px 8px; border-radius: 0;
@@ -926,14 +928,19 @@
                         if (!aktiveEkstraLag.includes(e.lag)) aktiveEkstraLag.push(e.lag);
                     };
 
+                    /* Flere spor: bryterne ligger side om side på samme linje */
+                    const sporRad = document.createElement('div');
+                    sporRad.className = 'spor-rad';
                     alle.forEach((e, i) => {
-                        videoContainer.appendChild(skapKontrollRad(alle.length > 1 ? 'Tilkomst spor ' + (i + 1) : 'Tilkomst', true, on => {
+                        const rad = skapKontrollRad(alle.length > 1 ? 'Spor ' + (i + 1) : 'Tilkomst', true, on => {
                             e.paa = on;
                             if (!e.lag) return;
                             if (on) visLag(e);
                             else { map.removeLayer(e.lag); aktiveEkstraLag = aktiveEkstraLag.filter(x => x !== e.lag); }
-                        }, e.farge));
+                        }, e.farge);
+                        sporRad.appendChild(rad);
                     });
+                    videoContainer.appendChild(sporRad);
 
                     Promise.all(alle.map(e => hentSporSegmenter(e.sp).then(segs => {
                         e.segs = segs;
