@@ -147,10 +147,6 @@
         .switch-thumb { width: 12px; height: 12px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: .3s; }
         .active .switch-track { background: var(--winter-ink); }
         .active .switch-thumb { transform: translateX(14px); }
-        .brattskala-rad { padding: 3px 6px; min-height: 32px; gap: 4px; }
-        .brattskala-rad .control-label { font-size: 11px; line-height: 1.15; }
-        .brattskala-rad .toggle-group { flex-direction: row; gap: 4px; }
-        .brattskala-rad .toggle-text { display: none; }
 
         .badge-label { position: absolute; top: -6px; right: -6px; font-size: 8px; padding: 1px 4px; border-radius: 8px; z-index: 10; font-weight: bold; pointer-events: none; }
         .badge-year { background: #fff; color: var(--muted); border: 1px solid #b5b5b5; }
@@ -162,6 +158,11 @@
         .ctl:hover { background: var(--winter-bg); }
         .ctl.ctl-summer:hover { background: var(--summer-bg); }
         .ctl.ctl-map:hover { background: var(--map-bg); }
+        .skala-toggle { display: inline-flex; align-items: center; gap: 6px; margin-left: 4px; padding-left: 10px; border-left: 1px solid rgba(255,255,255,.5); cursor: pointer; }
+        .skala-tekst { font-size: 12px; font-weight: 400; }
+        .skala-toggle .switch-track { background: rgba(255,255,255,.35); }
+        .skala-toggle.active .switch-track { background: #fff; }
+        .skala-toggle.active .switch-thumb { background: var(--winter-ink); transform: translateX(14px); }
         .btn-toggle-active, .btn-toggle-active:hover { background-color: var(--winter-ink) !important; color: #fff !important; border-color: var(--winter-ink) !important; }
 
         /* Stedsknapper */
@@ -270,6 +271,7 @@
 
         <button id="bratthetBtn" class="ctl">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20l7-12 4 7 3-4 6 9z"/></svg> Bratthet
+            <span id="skalaToggle" class="skala-toggle" role="switch" aria-checked="false" aria-label="Brattskala" title="Brattskala" hidden><span class="skala-tekst">Skala</span><span class="switch-track"><span class="switch-thumb"></span></span></span>
         </button>
 
         <button id="markerBtn" type="button" class="ctl ctl-marker" title="Marker et område du vil zoome til (dra en firkant med musen)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8V3h5M16 3h5v5M21 16v5h-5M8 21H3v-5"/><circle cx="11" cy="11" r="3.5"/><path d="M13.6 13.6L17 17"/></svg> Marker</button>
@@ -399,18 +401,25 @@
         };
 
         const bratthetBtn = document.getElementById('bratthetBtn');
+        const skalaToggle = document.getElementById('skalaToggle');
         let isBratthetActive = false;
         function toggleBratthet(state) {
             isBratthetActive = (typeof state === 'boolean') ? state : !isBratthetActive;
             if (isBratthetActive) { map.addLayer(bratthetMap); bratthetBtn.classList.add('btn-toggle-active'); }
-            else { map.removeLayer(bratthetMap); bratthetBtn.classList.remove('btn-toggle-active'); }
+            else { map.removeLayer(bratthetMap); bratthetBtn.classList.remove('btn-toggle-active'); toggleLegend(false); }
+            skalaToggle.hidden = !isBratthetActive;   // bryteren vises bare når bratthet er på
         }
         bratthetBtn.onclick = () => toggleBratthet();
+        skalaToggle.onclick = e => { e.stopPropagation(); toggleLegend(); };
 
         let isLegendActive = false;
         function toggleLegend(state) {
-            isLegendActive = (typeof state === 'boolean') ? state : !isLegendActive;
+            const ny = (typeof state === 'boolean') ? state : !isLegendActive;
+            if (ny === isLegendActive) return;
+            isLegendActive = ny;
             if (isLegendActive) legend.addTo(map); else map.removeControl(legend);
+            skalaToggle.classList.toggle('active', isLegendActive);
+            skalaToggle.setAttribute('aria-checked', String(isLegendActive));
         }
 
         /* ---------- Oversiktskart (grått land, hvitt hav, blå innsjøer) ---------- */
@@ -872,20 +881,6 @@
                 mapsBtn.addEventListener('click', e => { if (GOOGLE_MAPS_API_KEY && vanligKlikk(e)) { e.preventDefault(); aapneRute(sted); } });
                 videoContainer.appendChild(mapsBtn);
 
-                /* Brattskala */
-                const legendRow = document.createElement('div');
-                legendRow.className = 'control-row-container brattskala-rad';
-                legendRow.innerHTML = `
-                    <div class="control-label" style="display:flex; align-items:center; gap:5px;"><span>🏔️</span> Brattskala</div>
-                    <div class="toggle-group ${isLegendActive ? 'active' : ''}">
-                        <span class="toggle-text">Vis</span>
-                        <div class="switch-track"><div class="switch-thumb"></div></div>
-                    </div>`;
-                const legendToggleGroup = legendRow.querySelector('.toggle-group');
-                legendToggleGroup.onclick = () => toggleLegend(legendToggleGroup.classList.toggle('active'));
-                legendRow.style.order = '5';
-                videoContainer.appendChild(legendRow);
-
                 /* Tekst om veien dit */
                 const descBox = document.createElement('div');
                 descBox.className = 'desc-box';
@@ -1107,6 +1102,7 @@
         'Min posisjon': 'My location',
         'Klatrefører Tromsø': 'Climbing guide Tromsø',
         'Brattskala': 'Steepness scale',
+        'Skala': 'Scale',
         'Tilkomst': 'Approach',
         'Start': 'Start',
         'Last ned GPX': 'Download GPX',
