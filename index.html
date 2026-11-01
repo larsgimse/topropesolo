@@ -162,18 +162,10 @@
         .ctl.ctl-map:hover { background: var(--map-bg); }
         .btn-toggle-active, .btn-toggle-active:hover { background-color: var(--winter-ink) !important; color: #fff !important; border-color: var(--winter-ink) !important; }
 
-        /* Bokstavknapper med nedtrekksmeny */
-        .letter-dropdown { position: relative; display: inline-block; }
-        .letter-btn { position: relative; background: #fff; color: var(--ink); border: 1px solid var(--ink); border-radius: 0; padding: 10px 14px; cursor: pointer; font-size: 14px; font-weight: 400; white-space: nowrap; min-width: 38px; transition: background .3s ease, color .3s ease; }
+        /* Stedsknapper */
+        .letter-btn { position: relative; background: #fff; color: var(--ink); border: 1px solid var(--ink); border-radius: 0; padding: 10px 14px; cursor: pointer; font-size: 14px; font-weight: 400; white-space: nowrap; transition: background .3s ease, color .3s ease; }
         @media (hover: hover) { .letter-btn:hover:not(.active) { background: var(--winter-bg); } }
         .letter-btn.active { background: var(--winter-ink); border-color: var(--winter-ink); color: #fff; }
-        .dropdown-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 6px; background: #fff; border: 1px solid var(--ink); border-radius: 0; box-shadow: 0 10px 30px rgba(0,0,0,.12); padding: 6px 0; z-index: 10000; width: max-content; min-width: 240px; max-width: 320px; max-height: 60vh; overflow-y: auto; text-align: left; box-sizing: border-box; }
-        .dropdown-menu.show { display: block; }
-        .dropdown-item { padding: 8px 14px; font-size: 13px; font-weight: 400; color: var(--ink); cursor: pointer; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; transition: background .2s; white-space: normal; word-break: break-word; line-height: 1.35; }
-        .dropdown-item:hover, .dropdown-item.active { background: var(--winter-bg); }
-        .dropdown-item.active { font-weight: 500; }
-        .dropdown-item span:first-child { flex: 1 1 auto; }
-        .highlight-word { color: var(--winter-ink); font-weight: 600; }
 
         /* Søkefelt */
         .search-input-wrapper { position: relative; display: flex; align-items: center; }
@@ -247,11 +239,7 @@
         .marker-hint { position: absolute; z-index: 801; left: 10px; top: 10px; background: #fff; border: 1px solid var(--ink); padding: 4px 10px; font-size: 12px; font-weight: 400; color: var(--ink); pointer-events: none; }
 
         @media (max-width: 768px) {
-            #buttons { flex-wrap: nowrap; overflow-x: auto; padding: 10px 15px; scrollbar-width: none; }
-            #buttons::-webkit-scrollbar { display: none; }
-            .buttons-wrapper::after { content: ''; position: absolute; top: 0; right: 0; width: 40px; height: 100%; background: linear-gradient(to left, rgba(255,255,255,.95), rgba(255,255,255,0)); pointer-events: none; z-index: 10; transition: opacity .3s; }
-            .buttons-wrapper.scrolled-end::after { opacity: 0; }
-            .dropdown-menu { position: fixed !important; left: 50% !important; transform: translateX(-50%) !important; max-height: 65vh !important; min-width: 260px !important; max-width: 90vw !important; z-index: 99999 !important; box-shadow: 0 15px 35px rgba(0,0,0,.3) !important; }
+            #buttons { padding: 10px 2px; }
             #video-buttons-container { width: min(270px, calc(100% - 20px)); gap: 5px; }
             #map { height: 100vw; min-height: unset; width: 100%; }
             .custom-bmc-btn { margin-left: 0; }
@@ -705,7 +693,7 @@
             iconSize: [34, 34], iconAnchor: [17, 17], popupAnchor: [0, -17]
         });
 
-        /* ---------- Hover i bokstavmenyen ---------- */
+        /* ---------- Hover over stedsknappene ---------- */
         let hoverId = null, hoverStartView = null, hoverBackTimer = null;
         function startHover(sted) {
             if (isTouchDevice || aktivtStedNavn || isReseting) return;
@@ -730,91 +718,28 @@
         }
         function avbrytHover() { clearTimeout(hoverBackTimer); hoverId = null; hoverStartView = null; }
 
-        /* ---------- Bokstavknapper med nedtrekksmeny ---------- */
-        function hentStorBokstavMapping(navn) {
-            const deler = navn.split(/\s*[-–—/]\s*/);
-            const mapping = [];
-            deler.forEach(del => {
-                const ordListe = del.trim().split(/\s+/);
-                for (let ord of ordListe) {
-                    const ren = ord.replace(/^[^a-zæøåA-ZÆØÅ0-9]+/, '');
-                    if (ren.length > 0 && /[A-ZÆØÅ0-9]/.test(ren[0])) {
-                        mapping.push({ bokstav: /[0-9]/.test(ren[0]) ? '#' : ren[0].toUpperCase(), ord: ord });
-                        break;
-                    }
-                }
-            });
-            return mapping;
-        }
-        function formaterNavnMedFarge(navn, malord) {
-            if (!malord) return navn;
-            return navn.split(/(\s+|[-–—/])/).map(del => del === malord ? `<span class="highlight-word">${del}</span>` : del).join('');
-        }
-        function lukkAlleDropdowns() {
-            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
-            document.querySelectorAll('.letter-btn').forEach(b => b.classList.remove('active'));
-            avsluttHover();
-        }
-        function plasserMeny(menu, btn) {
-            menu.style.marginLeft = '0px'; menu.style.top = '';
-            if (window.matchMedia('(max-width: 768px)').matches) {
-                menu.style.top = (btn.getBoundingClientRect().bottom + 6) + 'px';
-            } else {
-                const r = menu.getBoundingClientRect();
-                let skift = 0;
-                if (r.left < 8) skift = 8 - r.left;
-                else if (r.right > window.innerWidth - 8) skift = window.innerWidth - 8 - r.right;
-                menu.style.marginLeft = skift + 'px';
-            }
-        }
-        document.addEventListener('click', (e) => { if (!e.target.closest('.letter-dropdown')) lukkAlleDropdowns(); });
+        /* ---------- Én knapp per klatresteds ---------- */
+        function lukkAlleDropdowns() { avsluttHover(); }
+        document.addEventListener('click', lukkAlleDropdowns);
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') lukkAlleDropdowns(); });
 
-        function byggBokstavMeny() {
-            const bokstavMap = {};
+        function byggStedKnapper() {
             steder.forEach(sted => {
-                knapperMap[sted.id] = { items: [], aktiver: null };
-                hentStorBokstavMapping(sted.navn).forEach(m => {
-                    if (!bokstavMap[m.bokstav]) bokstavMap[m.bokstav] = [];
-                    if (!bokstavMap[m.bokstav].some(entry => entry.sted === sted)) bokstavMap[m.bokstav].push({ sted, ord: m.ord });
-                });
-            });
-            Object.keys(bokstavMap).sort((a, b) => a.localeCompare(b, 'no')).forEach(bokstav => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'letter-dropdown';
                 const btn = document.createElement('button');
+                btn.type = 'button';
                 btn.className = 'letter-btn';
-                btn.innerText = bokstav;
-                const menu = document.createElement('div');
-                menu.className = 'dropdown-menu';
+                btn.textContent = sted.navn;
+                knapperMap[sted.id] = { items: [btn], aktiver: null };
                 btn.onclick = (e) => {
                     e.stopPropagation();
-                    const varAktiv = menu.classList.contains('show');
-                    lukkAlleDropdowns();
-                    if (!varAktiv) { menu.classList.add('show'); btn.classList.add('active'); plasserMeny(menu, btn); }
+                    avbrytHover();
+                    if (knapperMap[sted.id].aktiver) knapperMap[sted.id].aktiver();
                 };
-                bokstavMap[bokstav].forEach(entry => {
-                    const sted = entry.sted;
-                    const item = document.createElement('div');
-                    item.className = 'dropdown-item';
-                    const tekstSpan = document.createElement('span');
-                    tekstSpan.innerHTML = formaterNavnMedFarge(sted.navn, entry.ord);
-                    item.appendChild(tekstSpan);
-                    knapperMap[sted.id].items.push(item);
-                    item.onclick = (e) => {
-                        e.stopPropagation();
-                        avbrytHover(); lukkAlleDropdowns();
-                        if (knapperMap[sted.id].aktiver) knapperMap[sted.id].aktiver();
-                    };
-                    if (!isTouchDevice) {
-                        item.onmouseenter = () => startHover(sted);
-                        item.onmouseleave = () => planleggSluttHover();
-                    }
-                    menu.appendChild(item);
-                });
-                wrapper.appendChild(btn);
-                wrapper.appendChild(menu);
-                buttonsContainer.appendChild(wrapper);
+                if (!isTouchDevice) {
+                    btn.onmouseenter = () => startHover(sted);
+                    btn.onmouseleave = () => planleggSluttHover();
+                }
+                buttonsContainer.appendChild(btn);
             });
         }
 
@@ -871,7 +796,7 @@
                 const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?sted=' + encodeURIComponent(sted.id);
                 window.history.pushState({ path: newUrl }, '', newUrl);
 
-                document.querySelectorAll('.dropdown-item').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.letter-btn').forEach(el => el.classList.remove('active'));
                 knapperMap[sted.id].items.forEach(el => el.classList.add('active'));
                 fjernEkstraLag();
                 Object.keys(markorMap).forEach(id => markorMap[id].setIcon(lagKlatreIkon(id === sted.id ? 'inverted' : '')));
@@ -1083,7 +1008,7 @@
             .then(data => {
                 steder = (Array.isArray(data) ? data : data.steder || []).filter(s => s && s.gps && typeof s.gps.lat === 'number' && typeof s.gps.lng === 'number');
                 steder.sort((a, b) => a.navn.localeCompare(b.navn, 'no'));
-                byggBokstavMeny();
+                byggStedKnapper();
 
                 const listEl = document.getElementById('stedList');
                 steder.forEach(s => { const o = document.createElement('option'); o.value = s.navn; listEl.appendChild(o); });
@@ -1124,7 +1049,7 @@
             searchInput.value = '';
             const cleanUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
             window.history.pushState({ path: cleanUrl }, '', cleanUrl);
-            document.querySelectorAll('.dropdown-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.letter-btn').forEach(el => el.classList.remove('active'));
             avbrytHover(); lukkAlleDropdowns();
             map.closePopup();
             fjernEkstraLag();
